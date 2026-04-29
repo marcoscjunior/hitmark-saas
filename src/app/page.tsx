@@ -103,7 +103,7 @@ const useToast = () => {
 
 // --- MAIN APPLICATION COMPONENT ---
 export default function App() {
-  const [theme, setTheme] = useState<'dark' | 'light'>('dark');
+  const [theme, setTheme] = useState<'dark' | 'light'>('light');
   const { toast, showToast } = useToast();
   const [isInitializing, setIsInitializing] = useState(true);
   
