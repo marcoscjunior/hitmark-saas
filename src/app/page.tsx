@@ -101,8 +101,22 @@ const useToast = () => {
   return { toast, showToast };
 };
 
-// --- MAIN APPLICATION COMPONENT ---
+// --- RENDERIZADOR BLINDADO CONTRA CRASHES DA VERCEL ---
 export default function App() {
+  const [isMounted, setIsMounted] = useState(false);
+
+  useEffect(() => {
+    setIsMounted(true);
+  }, []);
+
+  // Previne a tela preta de crash do servidor renderizando nada até o navegador estar pronto
+  if (!isMounted) return <div className="w-full min-h-screen bg-slate-50"></div>;
+
+  return <HitMarkSystem />;
+}
+
+// --- MAIN APPLICATION COMPONENT ---
+function HitMarkSystem() {
   const { toast, showToast } = useToast();
   const [isInitializing, setIsInitializing] = useState(true);
   
@@ -299,21 +313,19 @@ function RegisterScreen({ onRegister, onGoLogin }: any) {
   );
 }
 
-// --- MAIN APP COMPONENT ---
 function MainApp({ currentUser, onLogout, companySettings, setCompanySettings, showToast }: any) {
   const [activeTab, setActiveTab] = useState('dashboard');
   const [vendors, setVendors] = useState<any[]>([]);
   const [selectedVendorId, setSelectedVendorId] = useState<string>('');
   const [selectedYear, setSelectedYear] = useState<number>(new Date().getFullYear());
 
-  // BLINDADO: Usando interrogação para caso "permissions" não exista
   const canAccess = (tab: string) => {
-    if (currentUser.role === 'MASTER') return true;
+    if (currentUser?.role === 'MASTER') return true;
     return currentUser?.permissions?.[tab] && currentUser.permissions[tab] !== 'none';
   };
   
   const canEdit = (tab: string) => {
-    if (currentUser.role === 'MASTER') return true;
+    if (currentUser?.role === 'MASTER') return true;
     return currentUser?.permissions?.[tab] === 'edit';
   };
 
@@ -323,26 +335,21 @@ function MainApp({ currentUser, onLogout, companySettings, setCompanySettings, s
       else if (canAccess('vendors')) setActiveTab('vendors');
       else setActiveTab('');
     }
-  }, [currentUser.permissions, activeTab]);
+  }, [currentUser?.permissions, activeTab]);
 
   useEffect(() => {
+    // Escutando a área COMPARTILHADA do banco de dados (public/data/vendors)
     const vendorsRef = collection(db, 'artifacts', appId, 'public', 'data', 'vendors');
-    
-    // BLINDADO: Tratamento de erro na leitura do snapshot para não explodir a tela
     const unsubscribe = onSnapshot(vendorsRef, (snapshot) => {
       const vData = snapshot.docs.map(doc => ({ id: doc.id, ...(doc.data() as any) }));
       
-      // BLINDADO: Garantindo que a ordenação não quebre se faltar nome
+      // Ordenação protegida caso o nome venha nulo
       setVendors(vData.sort((a, b) => (a.name || '').localeCompare(b.name || '')));
       
       if (vData.length > 0 && !selectedVendorId) {
         setSelectedVendorId(vData[0].id);
       }
-    }, (error) => {
-      console.error("Erro ao puxar vendedores:", error);
-      showToast("Não foi possível carregar os vendedores.", "error");
     });
-    
     return () => unsubscribe();
   }, []);
 
@@ -404,7 +411,7 @@ function MainApp({ currentUser, onLogout, companySettings, setCompanySettings, s
         
         <nav className="flex-1 px-4 py-6 space-y-1.5 overflow-y-auto">
           {NAVIGATION.map((item) => {
-            if (item.isMasterOnly && currentUser.role !== 'MASTER') return null;
+            if (item.isMasterOnly && currentUser?.role !== 'MASTER') return null;
             if (!item.isMasterOnly && !canAccess(item.id)) return null;
             
             const isActive = activeTab === item.id;
@@ -434,7 +441,7 @@ function MainApp({ currentUser, onLogout, companySettings, setCompanySettings, s
               <div className="ml-3 overflow-hidden">
                 <p className="text-sm font-semibold text-slate-900 truncate">{currentUser?.name || 'Usuário'}</p>
                 <div className="flex items-center mt-0.5">
-                  {currentUser.role === 'MASTER' ? (
+                  {currentUser?.role === 'MASTER' ? (
                     <Badge variant="indigo"><Shield className="w-3 h-3 mr-1"/> Master</Badge>
                   ) : (
                     <span className="text-xs text-slate-500 truncate">Usuário</span>
@@ -513,7 +520,7 @@ function MainApp({ currentUser, onLogout, companySettings, setCompanySettings, s
                     companySettings={companySettings}
                   />
                 )}
-                {activeTab === 'settings' && currentUser.role === 'MASTER' && (
+                {activeTab === 'settings' && currentUser?.role === 'MASTER' && (
                   <SettingsManager 
                     companySettings={companySettings} 
                     setCompanySettings={setCompanySettings} 
@@ -527,9 +534,10 @@ function MainApp({ currentUser, onLogout, companySettings, setCompanySettings, s
         </div>
       </main>
 
+      {/* --- MOBILE BOTTOM NAVIGATION --- */}
       <nav className="md:hidden fixed bottom-0 w-full bg-white border-t border-slate-200 flex justify-around items-center h-16 px-2 z-50 shadow-[0_-10px_40px_rgba(0,0,0,0.05)] pb-safe">
         {NAVIGATION.map((item) => {
-          if (item.isMasterOnly && currentUser.role !== 'MASTER') return null;
+          if (item.isMasterOnly && currentUser?.role !== 'MASTER') return null;
           if (!item.isMasterOnly && !canAccess(item.id)) return null;
           
           const isActive = activeTab === item.id;
@@ -660,9 +668,9 @@ function VendorsManager({ vendors, currentYear, showToast, hasEditPerm }: any) {
     if (!hasEditPerm) return showToast("Sem permissão", "error");
     if (!newVendorName.trim()) return;
     
-    const vendorId = crypto.randomUUID();
-    const docRef = doc(db, 'artifacts', appId, 'public', 'data', 'vendors', vendorId);
-    await setDoc(docRef, { name: newVendorName.trim(), goals: {}, actuals: {}, createdAt: Date.now() });
+    // Corrigido para usar a geração automática de ID do próprio Firebase (100% seguro)
+    const newDocRef = doc(collection(db, 'artifacts', appId, 'public', 'data', 'vendors'));
+    await setDoc(newDocRef, { name: newVendorName.trim(), goals: {}, actuals: {}, createdAt: Date.now() });
     
     setNewVendorName('');
     setIsAdding(false);
@@ -735,7 +743,6 @@ function VendorsManager({ vendors, currentYear, showToast, hasEditPerm }: any) {
               onClick={() => { setEditingVendor(editingVendor === vendor.id ? null : vendor.id); setEditorTab('goals'); }}
             >
               <div className="flex items-center w-full sm:w-auto">
-                {/* BLINDADO: Usando (vendor.name || 'V') caso alguém crie manual sem nome */}
                 <div className="w-10 h-10 md:w-12 md:h-12 rounded-xl bg-slate-100 text-indigo-600 flex items-center justify-center font-bold text-base md:text-lg border border-slate-200 mr-3 md:mr-4 shadow-inner shrink-0">
                   {(vendor.name || 'V').charAt(0).toUpperCase()}
                 </div>
@@ -973,7 +980,7 @@ function SettingsManager({ companySettings, setCompanySettings, showToast, curre
   };
 
   const handleUpdateUser = async (userId: string, field: string, value: any) => {
-    if (userId === currentUser.id && field === 'role' && value !== 'MASTER') {
+    if (userId === currentUser?.id && field === 'role' && value !== 'MASTER') {
       return showToast("Você não pode remover seu próprio acesso MASTER.", "error");
     }
     await updateDoc(doc(db, 'artifacts', appId, 'public', 'data', 'app_users', userId), { [field]: value });
@@ -983,6 +990,7 @@ function SettingsManager({ companySettings, setCompanySettings, showToast, curre
 
   const handleUpdatePermission = async (userId: string, tab: string, level: string) => {
     const userToUpdate = users.find(u => u.id === userId);
+    if (!userToUpdate) return;
     const newPerms = { ...userToUpdate.permissions, [tab]: level };
     await updateDoc(doc(db, 'artifacts', appId, 'public', 'data', 'app_users', userId), { permissions: newPerms });
     setUsers(users.map(u => u.id === userId ? { ...u, permissions: newPerms } : u));
