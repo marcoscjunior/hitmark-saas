@@ -4,14 +4,13 @@ import {
   BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip as RechartsTooltip, ResponsiveContainer, ComposedChart, Line, Legend 
 } from 'recharts';
 import { 
-  LayoutDashboard, Users, Printer, Settings, LogOut, Plus, Trash2, Edit, 
-  TrendingUp, Target, CalendarDays, ChevronDown, Shield, Key, Building, AlertCircle, CheckCircle2, Lock, Sun, Moon
+  LayoutDashboard, Users, Printer, Settings, LogOut, Plus, Trash2, ChevronDown, Shield, Key, Building, AlertCircle, CheckCircle2, Lock, Sun, Moon, Target, CalendarDays, TrendingUp
 } from 'lucide-react';
 
 // --- FIREBASE IMPORTS ---
-import { initializeApp } from 'firebase/app';
-import { getAuth, signInAnonymously, onAuthStateChanged } from 'firebase/auth';
-import { getFirestore, collection, doc, setDoc, getDocs, getDoc, updateDoc, deleteDoc, query, where, onSnapshot } from 'firebase/firestore';
+import { initializeApp, getApps, getApp } from 'firebase/app';
+import { getAuth, signInAnonymously } from 'firebase/auth';
+import { getFirestore, collection, doc, setDoc, getDocs, getDoc, updateDoc, deleteDoc, onSnapshot } from 'firebase/firestore';
 
 // --- FIREBASE INITIALIZATION ---
 const firebaseConfig = {
@@ -23,15 +22,10 @@ const firebaseConfig = {
   appId: "1:278429839526:web:595bc2ad12ddcd5fbec467"
 };
 
-let app: any, auth: any, db: any, appId: any;
-try {
-  app = initializeApp(firebaseConfig);
-  auth = getAuth(app);
-  db = getFirestore(app);
-  appId = "hitmark-saas-prod";
-} catch (error) {
-  console.error("Firebase init error:", error);
-}
+const app = !getApps().length ? initializeApp(firebaseConfig) : getApp();
+const auth = getAuth(app);
+const db = getFirestore(app);
+const appId = "hitmark-saas-prod";
 
 // --- UTILS ---
 const formatCurrency = (value: number) => new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(value);
@@ -107,7 +101,7 @@ const useToast = () => {
   return { toast, showToast };
 };
 
-// --- MAIN APPLICATION ---
+// --- MAIN APPLICATION COMPONENT ---
 export default function App() {
   const [theme, setTheme] = useState<'dark' | 'light'>('dark');
   const { toast, showToast } = useToast();
@@ -147,7 +141,6 @@ export default function App() {
       const foundUserDoc = snap.docs.find(doc => doc.data().code === code);
       
       if (foundUserDoc) {
-        // Correção do TypeScript adicionando a tipagem "any"
         const userData: any = { id: foundUserDoc.id, ...(foundUserDoc.data() as any) };
         setCurrentUser(userData);
         setView('app');
@@ -205,7 +198,7 @@ export default function App() {
 
   if (isInitializing) {
     return (
-      <div className={`${theme === 'dark' ? 'dark' : ''}`}>
+      <div className={`${theme === 'dark' ? 'dark' : ''} w-full min-h-screen`}>
         <div className="min-h-screen bg-slate-50 dark:bg-slate-950 flex items-center justify-center">
           <div className="flex flex-col items-center">
             <Target className="w-12 h-12 text-indigo-500 animate-pulse mb-4" />
@@ -217,7 +210,7 @@ export default function App() {
   }
 
   return (
-    <div className={`${theme === 'dark' ? 'dark' : ''}`}>
+    <div className={`${theme === 'dark' ? 'dark' : ''} w-full min-h-screen`}>
       <div className="min-h-screen bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-200 font-sans selection:bg-indigo-500/30 transition-colors">
         
         {toast.type && (
@@ -345,7 +338,6 @@ function MainApp({ currentUser, onLogout, companySettings, setCompanySettings, s
     if (!currentUser) return;
     const vendorsRef = collection(db, 'artifacts', appId, 'users', currentUser.id, 'vendors');
     const unsubscribe = onSnapshot(vendorsRef, (snapshot) => {
-      // Correção do TypeScript adicionando a tipagem "any"
       const vData = snapshot.docs.map(doc => ({ id: doc.id, ...(doc.data() as any) }));
       setVendors(vData.sort((a, b) => a.name.localeCompare(b.name)));
       if (vData.length > 0 && !selectedVendorId) {
@@ -951,7 +943,6 @@ function SettingsManager({ companySettings, setCompanySettings, showToast, curre
   useEffect(() => {
     const fetchUsers = async () => {
       const usersSnap = await getDocs(collection(db, 'artifacts', appId, 'public', 'data', 'app_users'));
-      // Correção do TypeScript adicionando a tipagem "any"
       setUsers(usersSnap.docs.map(d => ({ id: d.id, ...(d.data() as any) })));
     };
     fetchUsers();
