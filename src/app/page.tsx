@@ -229,76 +229,6 @@ export default function App() {
   );
 }
 
-// --- SCREENS ---
-
-function LoginScreen({ onLogin, onGoRegister }: any) {
-  const [code, setCode] = useState('');
-  return (
-    <div className="min-h-screen flex items-center justify-center p-4 relative overflow-hidden">
-      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[150vw] h-[150vw] md:w-[500px] md:h-[500px] bg-indigo-600/10 rounded-full blur-[100px] md:blur-[120px] pointer-events-none"></div>
-      <Card className="w-full max-w-md p-6 md:p-8 relative z-10 border-slate-200 bg-white/80 backdrop-blur-xl">
-        <div className="flex flex-col items-center mb-8">
-          <div className="w-12 h-12 bg-indigo-50 rounded-xl flex items-center justify-center mb-4 border border-indigo-100">
-            <Target className="w-6 h-6 text-indigo-600" />
-          </div>
-          <h1 className="text-2xl font-bold text-slate-900 tracking-tight">HitMark SaaS</h1>
-          <p className="text-slate-500 text-sm mt-1 text-center">Acesso ao painel corporativo</p>
-        </div>
-        <form onSubmit={(e) => { e.preventDefault(); onLogin(code); }} className="space-y-4">
-          <div>
-            <label className="block text-xs font-medium text-slate-600 mb-1.5 uppercase tracking-wider">Código de Acesso</label>
-            <div className="relative">
-              <Key className="absolute left-3 top-2.5 h-5 w-5 text-slate-400" />
-              <Input type="password" inputMode="numeric" value={code} onChange={(e:any) => setCode(e.target.value)} className="pl-10" placeholder="Digite seu código" autoFocus />
-            </div>
-          </div>
-          <Button type="submit" className="w-full" size="lg">Entrar no Sistema</Button>
-        </form>
-        <div className="mt-6 text-center">
-          <button onClick={onGoRegister} className="text-sm text-indigo-600 hover:text-indigo-700 font-medium transition-colors">
-            Não tem uma conta? Cadastre-se
-          </button>
-        </div>
-      </Card>
-    </div>
-  );
-}
-
-function RegisterScreen({ onRegister, onGoLogin }: any) {
-  const [name, setName] = useState('');
-  const [code, setCode] = useState('');
-  return (
-    <div className="min-h-screen flex items-center justify-center p-4 relative overflow-hidden">
-      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[150vw] h-[150vw] md:w-[500px] md:h-[500px] bg-indigo-600/10 rounded-full blur-[100px] md:blur-[120px] pointer-events-none"></div>
-      <Card className="w-full max-w-md p-6 md:p-8 relative z-10 border-slate-200 bg-white/80 backdrop-blur-xl">
-        <div className="flex flex-col items-center mb-6 md:mb-8">
-          <div className="w-12 h-12 bg-indigo-50 rounded-xl flex items-center justify-center mb-4 border border-indigo-100">
-            <Target className="w-6 h-6 text-indigo-600" />
-          </div>
-          <h1 className="text-2xl font-bold text-slate-900 tracking-tight text-center">Criar Conta HitMark</h1>
-          <p className="text-slate-500 text-[13px] mt-2 text-center leading-relaxed">O primeiro usuário cadastrado será o MASTER do sistema.</p>
-        </div>
-        <form onSubmit={(e) => { e.preventDefault(); onRegister(name, code); }} className="space-y-4">
-          <div>
-            <label className="block text-xs font-medium text-slate-600 mb-1.5 uppercase tracking-wider">Nome Completo</label>
-            <Input value={name} onChange={(e:any) => setName(e.target.value)} placeholder="Ex: João Silva" />
-          </div>
-          <div>
-            <label className="block text-xs font-medium text-slate-600 mb-1.5 uppercase tracking-wider">Código (Senha Numérica)</label>
-            <Input type="password" inputMode="numeric" value={code} onChange={(e:any) => setCode(e.target.value)} placeholder="Mínimo 4 caracteres" />
-          </div>
-          <Button type="submit" className="w-full mt-2" size="lg">Finalizar Cadastro</Button>
-        </form>
-        <div className="mt-6 text-center">
-          <button onClick={onGoLogin} className="text-sm text-slate-600 hover:text-slate-900 font-medium transition-colors">
-            Voltar para o Login
-          </button>
-        </div>
-      </Card>
-    </div>
-  );
-}
-
 // --- MAIN APP COMPONENT ---
 function MainApp({ currentUser, onLogout, companySettings, setCompanySettings, showToast }: any) {
   const [activeTab, setActiveTab] = useState('dashboard');
@@ -325,8 +255,8 @@ function MainApp({ currentUser, onLogout, companySettings, setCompanySettings, s
   }, [currentUser.permissions, activeTab]);
 
   useEffect(() => {
-    if (!currentUser) return;
-    const vendorsRef = collection(db, 'artifacts', appId, 'users', currentUser.id, 'vendors');
+    // CAMINHO COMPARTILHADO: mudamos de users/ID/vendors para public/data/vendors
+    const vendorsRef = collection(db, 'artifacts', appId, 'public', 'data', 'vendors');
     const unsubscribe = onSnapshot(vendorsRef, (snapshot) => {
       const vData = snapshot.docs.map(doc => ({ id: doc.id, ...(doc.data() as any) }));
       setVendors(vData.sort((a, b) => a.name.localeCompare(b.name)));
@@ -335,7 +265,7 @@ function MainApp({ currentUser, onLogout, companySettings, setCompanySettings, s
       }
     });
     return () => unsubscribe();
-  }, [currentUser.id]);
+  }, []);
 
   const selectedVendor = useMemo(() => vendors.find(v => v.id === selectedVendorId), [vendors, selectedVendorId]);
 
@@ -444,7 +374,6 @@ function MainApp({ currentUser, onLogout, companySettings, setCompanySettings, s
       <main className="flex-1 flex flex-col min-w-0 relative print-container overflow-hidden">
         <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full max-w-4xl h-64 bg-indigo-600/5 blur-[120px] rounded-full pointer-events-none print-hide"></div>
         
-        {/* HEADER RESPONSIVO */}
         <header className="py-3 md:h-16 md:py-0 bg-white/80 backdrop-blur-md border-b border-slate-200 flex flex-col md:flex-row items-center justify-between px-4 md:px-8 print-hide shrink-0 z-10 sticky top-0 gap-3 md:gap-0">
           <div className="flex w-full md:w-auto items-center justify-between">
             <h1 className="text-lg md:text-xl font-semibold text-slate-900 tracking-tight">
@@ -470,7 +399,6 @@ function MainApp({ currentUser, onLogout, companySettings, setCompanySettings, s
           </div>
         </header>
 
-        {/* CONTENT AREA */}
         <div className="flex-1 overflow-auto p-4 pb-24 md:p-8 md:pb-8 relative z-0 print:p-0 print:overflow-visible">
           <div className="max-w-6xl mx-auto space-y-6 md:space-y-8">
             {!canAccess(activeTab) ? (
@@ -494,7 +422,6 @@ function MainApp({ currentUser, onLogout, companySettings, setCompanySettings, s
                 {activeTab === 'vendors' && (
                   <VendorsManager 
                     vendors={vendors} 
-                    currentUser={currentUser} 
                     currentYear={selectedYear} 
                     showToast={showToast}
                     hasEditPerm={canEdit('vendors')}
@@ -521,7 +448,6 @@ function MainApp({ currentUser, onLogout, companySettings, setCompanySettings, s
         </div>
       </main>
 
-      {/* --- MOBILE BOTTOM NAVIGATION --- */}
       <nav className="md:hidden fixed bottom-0 w-full bg-white border-t border-slate-200 flex justify-around items-center h-16 px-2 z-50 shadow-[0_-10px_40px_rgba(0,0,0,0.05)] pb-safe">
         {NAVIGATION.map((item) => {
           if (item.isMasterOnly && currentUser.role !== 'MASTER') return null;
@@ -643,7 +569,7 @@ function DashboardView({ vendors, chartData, currentMonthData, selectedYear, set
   );
 }
 
-function VendorsManager({ vendors, currentUser, currentYear, showToast, hasEditPerm }: any) {
+function VendorsManager({ vendors, currentYear, showToast, hasEditPerm }: any) {
   const [isAdding, setIsAdding] = useState(false);
   const [newVendorName, setNewVendorName] = useState('');
   const [editingVendor, setEditingVendor] = useState<any>(null);
@@ -656,7 +582,7 @@ function VendorsManager({ vendors, currentUser, currentYear, showToast, hasEditP
     if (!newVendorName.trim()) return;
     
     const vendorId = crypto.randomUUID();
-    const docRef = doc(db, 'artifacts', appId, 'users', currentUser.id, 'vendors', vendorId);
+    const docRef = doc(db, 'artifacts', appId, 'public', 'data', 'vendors', vendorId);
     await setDoc(docRef, { name: newVendorName.trim(), goals: {}, actuals: {}, createdAt: Date.now() });
     
     setNewVendorName('');
@@ -667,7 +593,7 @@ function VendorsManager({ vendors, currentUser, currentYear, showToast, hasEditP
   const handleDelete = async (id: string) => {
     if (!hasEditPerm) return showToast("Sem permissão", "error");
     if(!confirm('Tem certeza que deseja excluir?')) return;
-    await deleteDoc(doc(db, 'artifacts', appId, 'users', currentUser.id, 'vendors', id));
+    await deleteDoc(doc(db, 'artifacts', appId, 'public', 'data', 'vendors', id));
     showToast("Vendedor removido.");
   };
 
@@ -676,7 +602,7 @@ function VendorsManager({ vendors, currentUser, currentYear, showToast, hasEditP
     const numericValue = parseFloat(value.replace(/[^0-9.-]+/g,""));
     if (isNaN(numericValue) && value !== '') return;
 
-    const docRef = doc(db, 'artifacts', appId, 'users', currentUser.id, 'vendors', vendorId);
+    const docRef = doc(db, 'artifacts', appId, 'public', 'data', 'vendors', vendorId);
     await updateDoc(docRef, { [`goals.${monthKey}`]: isNaN(numericValue) ? 0 : numericValue });
   };
 
@@ -685,14 +611,14 @@ function VendorsManager({ vendors, currentUser, currentYear, showToast, hasEditP
     const numericValue = parseFloat(value.replace(/[^0-9.-]+/g,""));
     const finalVal = isNaN(numericValue) ? 0 : numericValue;
 
-    const vendor = vendors.find(v => v.id === vendorId);
+    const vendor = vendors.find((v: any) => v.id === vendorId);
     const currentActuals = vendor.actuals?.[monthKey] || [];
     const newActuals = [...currentActuals];
     const weeks = getWeeksInMonth(currentYear, parseInt(monthKey.split('-')[1]));
     for(let i=0; i<weeks; i++) if(newActuals[i] === undefined) newActuals[i] = 0;
     newActuals[weekIndex] = finalVal;
 
-    const docRef = doc(db, 'artifacts', appId, 'users', currentUser.id, 'vendors', vendorId);
+    const docRef = doc(db, 'artifacts', appId, 'public', 'data', 'vendors', vendorId);
     await updateDoc(docRef, { [`actuals.${monthKey}`]: newActuals });
   };
 
@@ -723,7 +649,7 @@ function VendorsManager({ vendors, currentUser, currentYear, showToast, hasEditP
       )}
 
       <div className="grid grid-cols-1 gap-4">
-        {vendors.map(vendor => (
+        {vendors.map((vendor: any) => (
           <Card key={vendor.id} className="overflow-visible transition-all hover:border-slate-300">
             <div 
               className="p-4 md:p-5 flex flex-col sm:flex-row justify-between items-start sm:items-center cursor-pointer hover:bg-slate-50 transition-colors gap-4 sm:gap-0"
@@ -878,7 +804,6 @@ function ReportsView({ vendor, year, companySettings }: any) {
       </div>
 
       <Card className="p-4 md:p-10 bg-white text-slate-900 print:border-none print:shadow-none print:p-0 print:bg-transparent pb-6 print:pb-0">
-        {/* PRINT HEADER */}
         <div className="border-b border-slate-200 pb-6 mb-6 flex flex-col md:flex-row md:justify-between md:items-end gap-4">
           <div>
             <div className="flex items-center gap-2 mb-2">
@@ -894,7 +819,6 @@ function ReportsView({ vendor, year, companySettings }: any) {
           </div>
         </div>
 
-        {/* SUMMARY CARDS */}
         <div className="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-4 mb-6">
             <div className="bg-slate-50 p-3 rounded-lg border border-slate-200 text-center">
               <p className="text-[10px] md:text-xs text-slate-500 font-bold uppercase mb-1">Meta Mês</p>
@@ -914,7 +838,6 @@ function ReportsView({ vendor, year, companySettings }: any) {
             </div>
         </div>
 
-        {/* TABLE (WEEKS) */}
         <div className="overflow-x-auto rounded-lg border border-slate-200">
           <table className="w-full text-xs md:text-sm text-left">
             <thead className="bg-slate-50 text-slate-700 font-bold uppercase tracking-wider border-b border-slate-200">
@@ -941,10 +864,8 @@ function ReportsView({ vendor, year, companySettings }: any) {
             </tbody>
           </table>
         </div>
-
       </Card>
       
-      {/* PRINT FOOTER NEXIO */}
       <div className="hidden print:block fixed bottom-4 left-0 w-full text-[10px] text-center text-slate-400 uppercase tracking-widest font-semibold">
         DEVELOPED BY NEXIO
       </div>
@@ -990,18 +911,15 @@ function SettingsManager({ companySettings, setCompanySettings, showToast, curre
 
   return (
     <div className="space-y-10 md:space-y-12 animate-in fade-in slide-in-from-bottom-4 duration-500 pb-10">
-      
-      {/* --- SEÇÃO: DADOS DA EMPRESA --- */}
       <div className="flex flex-col md:flex-row gap-4 md:gap-8">
         <div className="w-full md:w-1/3">
           <h3 className="text-lg font-bold text-slate-900">Perfil da Empresa</h3>
-          <p className="text-sm text-slate-500 mt-1">Configure o nome fantasia que será impresso nos cabeçalhos dos relatórios e dashboards.</p>
+          <p className="text-sm text-slate-500 mt-1">Configure o nome fantasia que será impresso nos cabeçalhos.</p>
         </div>
-        
         <Card className="p-5 md:p-6 flex-1 bg-white">
           <div className="flex flex-col sm:flex-row gap-4 items-end">
             <div className="flex-1 w-full">
-              <label className="block text-[11px] font-bold text-slate-500 mb-2 uppercase tracking-wider">Razão Social / Nome Fantasia</label>
+              <label className="block text-[11px] font-bold text-slate-500 mb-2 uppercase tracking-wider">Nome da Empresa</label>
               <div className="relative">
                 <Building className="absolute left-3 top-2.5 h-5 w-5 text-slate-400" />
                 <Input value={companyNameInput} onChange={(e:any) => setCompanyNameInput(e.target.value)} className="pl-10 h-11" placeholder="Ex: HitMark Corp" />
@@ -1014,13 +932,12 @@ function SettingsManager({ companySettings, setCompanySettings, showToast, curre
 
       <div className="h-px bg-slate-200 w-full"></div>
 
-      {/* --- SEÇÃO: USUÁRIOS E ACESSOS --- */}
       <div className="flex flex-col md:flex-row gap-4 md:gap-8">
         <div className="w-full md:w-1/3">
           <h3 className="text-lg font-bold text-slate-900">Controle de Acesso</h3>
-          <p className="text-sm text-slate-500 mt-1">Gerencie logins, senhas e níveis de permissão da sua equipe no sistema.</p>
+          <p className="text-sm text-slate-500 mt-1">Gerencie logins, senhas e permissões da equipe.</p>
           <div className="mt-5 inline-flex items-center px-3 py-1.5 bg-indigo-50 text-indigo-700 rounded-full text-xs font-bold border border-indigo-100">
-            <Users className="w-4 h-4 mr-2" /> {users.length} Usuário(s) Cadastrado(s)
+            <Users className="w-4 h-4 mr-2" /> {users.length} Usuário(s)
           </div>
         </div>
         
@@ -1028,8 +945,6 @@ function SettingsManager({ companySettings, setCompanySettings, showToast, curre
           {users.map(u => (
             <Card key={u.id} className={`overflow-visible transition-all border-l-4 ${u.role === 'MASTER' ? 'border-l-indigo-500 shadow-md' : 'border-l-slate-300'}`}>
               <div className="p-5 md:p-6">
-                
-                {/* Cabeçalho do Card do Usuário */}
                 <div className="flex justify-between items-start mb-6">
                   <div className="flex items-center gap-3">
                     <div className={`w-10 h-10 rounded-full flex items-center justify-center font-bold text-sm shadow-inner shrink-0 ${u.role === 'MASTER' ? 'bg-indigo-600 text-white' : 'bg-slate-100 text-slate-600 border border-slate-200'}`}>
@@ -1047,14 +962,13 @@ function SettingsManager({ companySettings, setCompanySettings, showToast, curre
                   )}
                 </div>
 
-                {/* Campos de Edição Básicos */}
                 <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-2">
                   <div>
                     <label className="block text-[10px] font-bold text-slate-500 mb-1.5 uppercase tracking-wider">Nome de Exibição</label>
                     <Input defaultValue={u.name} onBlur={(e:any) => { if(e.target.value !== u.name) handleUpdateUser(u.id, 'name', e.target.value) }} className="h-9 text-sm" />
                   </div>
                   <div>
-                    <label className="block text-[10px] font-bold text-slate-500 mb-1.5 uppercase tracking-wider">Nova Senha (Numérica)</label>
+                    <label className="block text-[10px] font-bold text-slate-500 mb-1.5 uppercase tracking-wider">Nova Senha</label>
                     <Input type="password" inputMode="numeric" placeholder="••••" onBlur={(e:any) => { if(e.target.value.trim() !== '') { handleUpdateUser(u.id, 'code', e.target.value); e.target.value = ''; } }} className="h-9 text-sm" />
                   </div>
                   <div>
@@ -1068,7 +982,6 @@ function SettingsManager({ companySettings, setCompanySettings, showToast, curre
                   </div>
                 </div>
 
-                {/* Área de Permissões Específicas (Escondida se for Master) */}
                 {u.role !== 'MASTER' && (
                   <div className="mt-6 pt-5 border-t border-slate-100 bg-slate-50/50 -mx-5 md:-mx-6 -mb-5 md:-mb-6 p-5 md:p-6 rounded-b-xl">
                     <h5 className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-3">Permissões de Módulos</h5>
@@ -1092,7 +1005,6 @@ function SettingsManager({ companySettings, setCompanySettings, showToast, curre
                     </div>
                   </div>
                 )}
-
               </div>
             </Card>
           ))}
