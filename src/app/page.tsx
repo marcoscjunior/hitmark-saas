@@ -141,7 +141,7 @@ export default function App() {
         const userData: any = { id: foundUserDoc.id, ...(foundUserDoc.data() as any) };
         setCurrentUser(userData);
         setView('app');
-        showToast(`Bem-vindo(a), ${userData.name.split(' ')[0]}!`);
+        showToast(`Bem-vindo(a), ${userData.name ? userData.name.split(' ')[0] : 'Usuário'}!`);
       } else {
         showToast("Código inválido", 'error');
       }
@@ -229,6 +229,76 @@ export default function App() {
   );
 }
 
+// --- SCREENS ---
+
+function LoginScreen({ onLogin, onGoRegister }: any) {
+  const [code, setCode] = useState('');
+  return (
+    <div className="min-h-screen flex items-center justify-center p-4 relative overflow-hidden">
+      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[150vw] h-[150vw] md:w-[500px] md:h-[500px] bg-indigo-600/10 rounded-full blur-[100px] md:blur-[120px] pointer-events-none"></div>
+      <Card className="w-full max-w-md p-6 md:p-8 relative z-10 border-slate-200 bg-white/80 backdrop-blur-xl">
+        <div className="flex flex-col items-center mb-8">
+          <div className="w-12 h-12 bg-indigo-50 rounded-xl flex items-center justify-center mb-4 border border-indigo-100">
+            <Target className="w-6 h-6 text-indigo-600" />
+          </div>
+          <h1 className="text-2xl font-bold text-slate-900 tracking-tight">HitMark SaaS</h1>
+          <p className="text-slate-500 text-sm mt-1 text-center">Acesso ao painel corporativo</p>
+        </div>
+        <form onSubmit={(e) => { e.preventDefault(); onLogin(code); }} className="space-y-4">
+          <div>
+            <label className="block text-xs font-medium text-slate-600 mb-1.5 uppercase tracking-wider">Código de Acesso</label>
+            <div className="relative">
+              <Key className="absolute left-3 top-2.5 h-5 w-5 text-slate-400" />
+              <Input type="password" inputMode="numeric" value={code} onChange={(e:any) => setCode(e.target.value)} className="pl-10" placeholder="Digite seu código" autoFocus />
+            </div>
+          </div>
+          <Button type="submit" className="w-full" size="lg">Entrar no Sistema</Button>
+        </form>
+        <div className="mt-6 text-center">
+          <button onClick={onGoRegister} className="text-sm text-indigo-600 hover:text-indigo-700 font-medium transition-colors">
+            Não tem uma conta? Cadastre-se
+          </button>
+        </div>
+      </Card>
+    </div>
+  );
+}
+
+function RegisterScreen({ onRegister, onGoLogin }: any) {
+  const [name, setName] = useState('');
+  const [code, setCode] = useState('');
+  return (
+    <div className="min-h-screen flex items-center justify-center p-4 relative overflow-hidden">
+      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[150vw] h-[150vw] md:w-[500px] md:h-[500px] bg-indigo-600/10 rounded-full blur-[100px] md:blur-[120px] pointer-events-none"></div>
+      <Card className="w-full max-w-md p-6 md:p-8 relative z-10 border-slate-200 bg-white/80 backdrop-blur-xl">
+        <div className="flex flex-col items-center mb-6 md:mb-8">
+          <div className="w-12 h-12 bg-indigo-50 rounded-xl flex items-center justify-center mb-4 border border-indigo-100">
+            <Target className="w-6 h-6 text-indigo-600" />
+          </div>
+          <h1 className="text-2xl font-bold text-slate-900 tracking-tight text-center">Criar Conta HitMark</h1>
+          <p className="text-slate-500 text-[13px] mt-2 text-center leading-relaxed">O primeiro usuário cadastrado será o MASTER do sistema.</p>
+        </div>
+        <form onSubmit={(e) => { e.preventDefault(); onRegister(name, code); }} className="space-y-4">
+          <div>
+            <label className="block text-xs font-medium text-slate-600 mb-1.5 uppercase tracking-wider">Nome Completo</label>
+            <Input value={name} onChange={(e:any) => setName(e.target.value)} placeholder="Ex: João Silva" />
+          </div>
+          <div>
+            <label className="block text-xs font-medium text-slate-600 mb-1.5 uppercase tracking-wider">Código (Senha Numérica)</label>
+            <Input type="password" inputMode="numeric" value={code} onChange={(e:any) => setCode(e.target.value)} placeholder="Mínimo 4 caracteres" />
+          </div>
+          <Button type="submit" className="w-full mt-2" size="lg">Finalizar Cadastro</Button>
+        </form>
+        <div className="mt-6 text-center">
+          <button onClick={onGoLogin} className="text-sm text-slate-600 hover:text-slate-900 font-medium transition-colors">
+            Voltar para o Login
+          </button>
+        </div>
+      </Card>
+    </div>
+  );
+}
+
 // --- MAIN APP COMPONENT ---
 function MainApp({ currentUser, onLogout, companySettings, setCompanySettings, showToast }: any) {
   const [activeTab, setActiveTab] = useState('dashboard');
@@ -236,14 +306,15 @@ function MainApp({ currentUser, onLogout, companySettings, setCompanySettings, s
   const [selectedVendorId, setSelectedVendorId] = useState<string>('');
   const [selectedYear, setSelectedYear] = useState<number>(new Date().getFullYear());
 
+  // BLINDADO: Usando interrogação para caso "permissions" não exista
   const canAccess = (tab: string) => {
     if (currentUser.role === 'MASTER') return true;
-    return currentUser.permissions[tab] && currentUser.permissions[tab] !== 'none';
+    return currentUser?.permissions?.[tab] && currentUser.permissions[tab] !== 'none';
   };
   
   const canEdit = (tab: string) => {
     if (currentUser.role === 'MASTER') return true;
-    return currentUser.permissions[tab] === 'edit';
+    return currentUser?.permissions?.[tab] === 'edit';
   };
 
   useEffect(() => {
@@ -255,15 +326,23 @@ function MainApp({ currentUser, onLogout, companySettings, setCompanySettings, s
   }, [currentUser.permissions, activeTab]);
 
   useEffect(() => {
-    // CAMINHO COMPARTILHADO: mudamos de users/ID/vendors para public/data/vendors
     const vendorsRef = collection(db, 'artifacts', appId, 'public', 'data', 'vendors');
+    
+    // BLINDADO: Tratamento de erro na leitura do snapshot para não explodir a tela
     const unsubscribe = onSnapshot(vendorsRef, (snapshot) => {
       const vData = snapshot.docs.map(doc => ({ id: doc.id, ...(doc.data() as any) }));
-      setVendors(vData.sort((a, b) => a.name.localeCompare(b.name)));
+      
+      // BLINDADO: Garantindo que a ordenação não quebre se faltar nome
+      setVendors(vData.sort((a, b) => (a.name || '').localeCompare(b.name || '')));
+      
       if (vData.length > 0 && !selectedVendorId) {
         setSelectedVendorId(vData[0].id);
       }
+    }, (error) => {
+      console.error("Erro ao puxar vendedores:", error);
+      showToast("Não foi possível carregar os vendedores.", "error");
     });
+    
     return () => unsubscribe();
   }, []);
 
@@ -350,10 +429,10 @@ function MainApp({ currentUser, onLogout, companySettings, setCompanySettings, s
           <div className="bg-slate-50 rounded-xl p-3 border border-slate-200 mb-3">
             <div className="flex items-center">
               <div className="w-8 h-8 rounded-full bg-indigo-600 text-white flex items-center justify-center font-bold text-xs uppercase shadow-inner">
-                {currentUser.name ? currentUser.name.substring(0, 2).toUpperCase() : 'US'}
+                {currentUser?.name ? currentUser.name.substring(0, 2).toUpperCase() : 'US'}
               </div>
               <div className="ml-3 overflow-hidden">
-                <p className="text-sm font-semibold text-slate-900 truncate">{currentUser.name}</p>
+                <p className="text-sm font-semibold text-slate-900 truncate">{currentUser?.name || 'Usuário'}</p>
                 <div className="flex items-center mt-0.5">
                   {currentUser.role === 'MASTER' ? (
                     <Badge variant="indigo"><Shield className="w-3 h-3 mr-1"/> Master</Badge>
@@ -392,7 +471,7 @@ function MainApp({ currentUser, onLogout, companySettings, setCompanySettings, s
               <Select 
                 value={selectedVendorId} 
                 onChange={(e: any) => setSelectedVendorId(e.target.value)}
-                options={vendors.map(v => ({ value: v.id, label: v.name }))}
+                options={vendors.map(v => ({ value: v.id, label: v.name || 'Sem Nome' }))}
                 className="w-full md:w-64 shadow-sm"
               />
             )}
@@ -656,12 +735,13 @@ function VendorsManager({ vendors, currentYear, showToast, hasEditPerm }: any) {
               onClick={() => { setEditingVendor(editingVendor === vendor.id ? null : vendor.id); setEditorTab('goals'); }}
             >
               <div className="flex items-center w-full sm:w-auto">
+                {/* BLINDADO: Usando (vendor.name || 'V') caso alguém crie manual sem nome */}
                 <div className="w-10 h-10 md:w-12 md:h-12 rounded-xl bg-slate-100 text-indigo-600 flex items-center justify-center font-bold text-base md:text-lg border border-slate-200 mr-3 md:mr-4 shadow-inner shrink-0">
-                  {vendor.name.charAt(0)}
+                  {(vendor.name || 'V').charAt(0).toUpperCase()}
                 </div>
                 <div className="truncate">
-                  <h3 className="font-semibold text-slate-900 text-sm md:text-lg truncate">{vendor.name}</h3>
-                  <p className="text-[11px] md:text-sm text-slate-500">Cadastrado em {new Date(vendor.createdAt).toLocaleDateString()}</p>
+                  <h3 className="font-semibold text-slate-900 text-sm md:text-lg truncate">{vendor.name || 'Vendedor Sem Nome'}</h3>
+                  <p className="text-[11px] md:text-sm text-slate-500">Cadastrado em {vendor.createdAt ? new Date(vendor.createdAt).toLocaleDateString() : 'N/A'}</p>
                 </div>
               </div>
               <div className="flex items-center justify-between sm:justify-end w-full sm:w-auto gap-2 border-t sm:border-0 border-slate-100 pt-3 sm:pt-0">
@@ -808,14 +888,14 @@ function ReportsView({ vendor, year, companySettings }: any) {
           <div>
             <div className="flex items-center gap-2 mb-2">
               <Building className="w-6 h-6 md:w-8 md:h-8 text-indigo-600" />
-              <span className="text-2xl md:text-4xl font-black text-slate-900 tracking-tight">{companySettings.name}</span>
+              <span className="text-2xl md:text-4xl font-black text-slate-900 tracking-tight">{companySettings?.name || 'HitMark Company'}</span>
             </div>
             <h1 className="text-base md:text-xl font-bold text-slate-500 tracking-tight uppercase">Relatório de Metas</h1>
             <p className="text-sm text-slate-500 mt-1 font-medium">Mês Base: {MONTHS_FULL[reportMonth - 1]} {year}</p>
           </div>
           <div className="text-left md:text-right bg-slate-50 p-3 md:p-4 rounded-xl border border-slate-100">
             <p className="text-[10px] md:text-xs text-slate-400 font-bold uppercase tracking-wider mb-1">Vendedor Associado</p>
-            <h2 className="text-lg md:text-xl font-bold text-indigo-600">{vendor.name}</h2>
+            <h2 className="text-lg md:text-xl font-bold text-indigo-600">{vendor.name || 'Vendedor Sem Nome'}</h2>
           </div>
         </div>
 
@@ -875,7 +955,7 @@ function ReportsView({ vendor, year, companySettings }: any) {
 
 function SettingsManager({ companySettings, setCompanySettings, showToast, currentUser }: any) {
   const [users, setUsers] = useState<any[]>([]);
-  const [companyNameInput, setCompanyNameInput] = useState(companySettings.name || '');
+  const [companyNameInput, setCompanyNameInput] = useState(companySettings?.name || '');
 
   useEffect(() => {
     const fetchUsers = async () => {
@@ -951,7 +1031,7 @@ function SettingsManager({ companySettings, setCompanySettings, showToast, curre
                       {u.name ? u.name.substring(0, 2).toUpperCase() : 'US'}
                     </div>
                     <div>
-                      <h4 className="font-bold text-slate-900 truncate max-w-[150px] sm:max-w-full">{u.name}</h4>
+                      <h4 className="font-bold text-slate-900 truncate max-w-[150px] sm:max-w-full">{u.name || 'Sem Nome'}</h4>
                       <p className="text-[10px] md:text-xs text-slate-400 font-mono mt-0.5">ID: {u.id.substring(0, 8)}</p>
                     </div>
                   </div>
