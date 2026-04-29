@@ -4,7 +4,7 @@ import {
   BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip as RechartsTooltip, ResponsiveContainer, ComposedChart, Line, Legend 
 } from 'recharts';
 import { 
-  LayoutDashboard, Users, Printer, Settings, LogOut, Plus, Trash2, ChevronDown, Shield, Key, Building, AlertCircle, CheckCircle2, Lock, Sun, Moon, Target, CalendarDays, TrendingUp
+  LayoutDashboard, Users, Printer, Settings, LogOut, Plus, Trash2, ChevronDown, Shield, Key, Building, AlertCircle, CheckCircle2, Lock, Target, CalendarDays, TrendingUp
 } from 'lucide-react';
 
 // --- FIREBASE IMPORTS ---
@@ -45,17 +45,17 @@ const MONTHS_FULL = ['Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho',
 
 // --- UI COMPONENTS ---
 const Card = ({ children, className = '' }: any) => (
-  <div className={`bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 shadow-xl overflow-hidden transition-colors ${className}`}>{children}</div>
+  <div className={`bg-white rounded-xl border border-slate-200 shadow-xl overflow-hidden transition-colors ${className}`}>{children}</div>
 );
 
 const Button = ({ children, variant = 'primary', size = 'default', className = '', ...props }: any) => {
   const base = "inline-flex items-center justify-center rounded-lg font-medium transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 disabled:opacity-50 disabled:pointer-events-none active:scale-[0.98]";
   const variants = {
     primary: "bg-indigo-600 text-white hover:bg-indigo-700 shadow-md shadow-indigo-900/20",
-    secondary: "bg-slate-100 dark:bg-slate-800 text-slate-900 dark:text-slate-100 hover:bg-slate-200 dark:hover:bg-slate-700 border border-slate-200 dark:border-slate-700",
-    outline: "border border-slate-200 dark:border-slate-700 bg-transparent hover:bg-slate-50 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-200",
-    ghost: "bg-transparent hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-600 dark:text-slate-300",
-    danger: "bg-red-500/10 text-red-600 dark:text-red-500 hover:bg-red-500/20"
+    secondary: "bg-slate-100 text-slate-900 hover:bg-slate-200 border border-slate-200",
+    outline: "border border-slate-200 bg-transparent hover:bg-slate-50 text-slate-700",
+    ghost: "bg-transparent hover:bg-slate-100 text-slate-600",
+    danger: "bg-red-500/10 text-red-600 hover:bg-red-500/20"
   };
   const sizes = {
     sm: "h-8 px-3 text-xs",
@@ -67,24 +67,24 @@ const Button = ({ children, variant = 'primary', size = 'default', className = '
 };
 
 const Input = React.forwardRef<HTMLInputElement, any>(({ className = '', ...props }, ref) => (
-  <input ref={ref} className={`flex h-10 w-full rounded-lg border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-950 px-3 py-2 text-sm text-slate-900 dark:text-slate-100 placeholder:text-slate-400 dark:placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent disabled:cursor-not-allowed disabled:opacity-50 transition-colors ${className}`} {...props} />
+  <input ref={ref} className={`flex h-10 w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent disabled:cursor-not-allowed disabled:opacity-50 transition-colors ${className}`} {...props} />
 ));
 
 const Select = ({ value, onChange, options, className = '', disabled = false }: any) => (
   <div className="relative">
-    <select value={value} onChange={onChange} disabled={disabled} className={`appearance-none flex h-10 w-full rounded-lg border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-950 px-3 py-2 text-sm text-slate-900 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent pr-8 disabled:opacity-50 transition-colors ${className}`}>
+    <select value={value} onChange={onChange} disabled={disabled} className={`appearance-none flex h-10 w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm text-slate-900 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent pr-8 disabled:opacity-50 transition-colors ${className}`}>
       {options.map((opt: any) => <option key={opt.value} value={opt.value}>{opt.label}</option>)}
     </select>
-    <ChevronDown className="absolute right-3 top-3 h-4 w-4 text-slate-400 dark:text-slate-500 pointer-events-none" />
+    <ChevronDown className="absolute right-3 top-3 h-4 w-4 text-slate-400 pointer-events-none" />
   </div>
 );
 
 const Badge = ({ children, variant = 'default' }: any) => {
   const variants = {
-    default: "bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300",
-    success: "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20",
-    warning: "bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-500/20",
-    indigo: "bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 border border-indigo-500/20"
+    default: "bg-slate-100 text-slate-700",
+    success: "bg-emerald-500/10 text-emerald-600 border border-emerald-500/20",
+    warning: "bg-amber-500/10 text-amber-600 border border-amber-500/20",
+    indigo: "bg-indigo-500/10 text-indigo-600 border border-indigo-500/20"
   };
   return <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium transition-colors ${variants[variant as keyof typeof variants]}`}>{children}</span>;
 }
@@ -103,15 +103,12 @@ const useToast = () => {
 
 // --- MAIN APPLICATION COMPONENT ---
 export default function App() {
-  const [theme, setTheme] = useState<'dark' | 'light'>('light');
   const { toast, showToast } = useToast();
   const [isInitializing, setIsInitializing] = useState(true);
   
   const [currentUser, setCurrentUser] = useState<any>(null);
   const [view, setView] = useState<'login' | 'register' | 'app'>('login');
   const [companySettings, setCompanySettings] = useState({ name: 'HitMark Company' });
-
-  const toggleTheme = () => setTheme(prev => prev === 'dark' ? 'light' : 'dark');
 
   useEffect(() => {
     const initApp = async () => {
@@ -198,11 +195,11 @@ export default function App() {
 
   if (isInitializing) {
     return (
-      <div className={`${theme === 'dark' ? 'dark' : ''} w-full min-h-screen`}>
-        <div className="min-h-screen bg-slate-50 dark:bg-slate-950 flex items-center justify-center">
+      <div className="w-full min-h-screen">
+        <div className="min-h-screen bg-slate-50 flex items-center justify-center">
           <div className="flex flex-col items-center">
             <Target className="w-12 h-12 text-indigo-500 animate-pulse mb-4" />
-            <p className="text-slate-500 dark:text-slate-400 font-medium">Inicializando HitMark...</p>
+            <p className="text-slate-500 font-medium">Inicializando HitMark...</p>
           </div>
         </div>
       </div>
@@ -210,11 +207,11 @@ export default function App() {
   }
 
   return (
-    <div className={`${theme === 'dark' ? 'dark' : ''} w-full min-h-screen`}>
-      <div className="min-h-screen bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-200 font-sans selection:bg-indigo-500/30 transition-colors">
+    <div className="w-full min-h-screen">
+      <div className="min-h-screen bg-slate-50 text-slate-900 font-sans selection:bg-indigo-500/30 transition-colors">
         
         {toast.type && (
-          <div className={`fixed top-4 right-4 z-50 px-4 py-3 rounded-lg shadow-2xl border flex items-center animate-in slide-in-from-top-2 ${toast.type === 'success' ? 'bg-emerald-50 dark:bg-emerald-950/80 border-emerald-200 dark:border-emerald-900 text-emerald-700 dark:text-emerald-400' : 'bg-red-50 dark:bg-red-950/80 border-red-200 dark:border-red-900 text-red-700 dark:text-red-400'}`}>
+          <div className={`fixed top-4 right-4 z-50 px-4 py-3 rounded-lg shadow-2xl border flex items-center animate-in slide-in-from-top-2 ${toast.type === 'success' ? 'bg-emerald-50 border-emerald-200 text-emerald-700' : 'bg-red-50 border-red-200 text-red-700'}`}>
             {toast.type === 'success' ? <CheckCircle2 className="w-5 h-5 mr-2" /> : <AlertCircle className="w-5 h-5 mr-2" />}
             <span className="text-sm font-medium">{toast.message}</span>
           </div>
@@ -230,8 +227,6 @@ export default function App() {
             companySettings={companySettings}
             setCompanySettings={setCompanySettings}
             showToast={showToast}
-            theme={theme}
-            toggleTheme={toggleTheme}
           />
         )}
       </div>
@@ -245,27 +240,27 @@ function LoginScreen({ onLogin, onGoRegister }: any) {
   const [code, setCode] = useState('');
   return (
     <div className="min-h-screen flex items-center justify-center p-4 relative overflow-hidden">
-      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] bg-indigo-600/10 dark:bg-indigo-600/20 rounded-full blur-[120px] pointer-events-none"></div>
-      <Card className="w-full max-w-md p-8 relative z-10 border-slate-200 dark:border-slate-800/60 bg-white/80 dark:bg-slate-900/80 backdrop-blur-xl">
+      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] bg-indigo-600/10 rounded-full blur-[120px] pointer-events-none"></div>
+      <Card className="w-full max-w-md p-8 relative z-10 border-slate-200 bg-white/80 backdrop-blur-xl">
         <div className="flex flex-col items-center mb-8">
-          <div className="w-12 h-12 bg-indigo-50 dark:bg-indigo-500/10 rounded-xl flex items-center justify-center mb-4 border border-indigo-100 dark:border-indigo-500/20">
-            <Target className="w-6 h-6 text-indigo-600 dark:text-indigo-400" />
+          <div className="w-12 h-12 bg-indigo-50 rounded-xl flex items-center justify-center mb-4 border border-indigo-100">
+            <Target className="w-6 h-6 text-indigo-600" />
           </div>
-          <h1 className="text-2xl font-bold text-slate-900 dark:text-white tracking-tight">HitMark SaaS</h1>
-          <p className="text-slate-500 dark:text-slate-400 text-sm mt-1">Acesso ao painel corporativo</p>
+          <h1 className="text-2xl font-bold text-slate-900 tracking-tight">HitMark SaaS</h1>
+          <p className="text-slate-500 text-sm mt-1">Acesso ao painel corporativo</p>
         </div>
         <form onSubmit={(e) => { e.preventDefault(); onLogin(code); }} className="space-y-4">
           <div>
-            <label className="block text-xs font-medium text-slate-600 dark:text-slate-400 mb-1.5 uppercase tracking-wider">Código de Acesso</label>
+            <label className="block text-xs font-medium text-slate-600 mb-1.5 uppercase tracking-wider">Código de Acesso</label>
             <div className="relative">
-              <Key className="absolute left-3 top-2.5 h-5 w-5 text-slate-400 dark:text-slate-500" />
+              <Key className="absolute left-3 top-2.5 h-5 w-5 text-slate-400" />
               <Input type="password" value={code} onChange={(e:any) => setCode(e.target.value)} className="pl-10" placeholder="Digite seu código" autoFocus />
             </div>
           </div>
           <Button type="submit" className="w-full" size="lg">Entrar no Sistema</Button>
         </form>
         <div className="mt-6 text-center">
-          <button onClick={onGoRegister} className="text-sm text-indigo-600 dark:text-indigo-400 hover:text-indigo-700 dark:hover:text-indigo-300 font-medium transition-colors">
+          <button onClick={onGoRegister} className="text-sm text-indigo-600 hover:text-indigo-700 font-medium transition-colors">
             Não tem uma conta? Cadastre-se
           </button>
         </div>
@@ -279,28 +274,28 @@ function RegisterScreen({ onRegister, onGoLogin }: any) {
   const [code, setCode] = useState('');
   return (
     <div className="min-h-screen flex items-center justify-center p-4 relative overflow-hidden">
-      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] bg-indigo-600/10 dark:bg-indigo-600/20 rounded-full blur-[120px] pointer-events-none"></div>
-      <Card className="w-full max-w-md p-8 relative z-10 border-slate-200 dark:border-slate-800/60 bg-white/80 dark:bg-slate-900/80 backdrop-blur-xl">
+      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] bg-indigo-600/10 rounded-full blur-[120px] pointer-events-none"></div>
+      <Card className="w-full max-w-md p-8 relative z-10 border-slate-200 bg-white/80 backdrop-blur-xl">
         <div className="flex flex-col items-center mb-8">
-          <div className="w-12 h-12 bg-indigo-50 dark:bg-indigo-500/10 rounded-xl flex items-center justify-center mb-4 border border-indigo-100 dark:border-indigo-500/20">
-            <Target className="w-6 h-6 text-indigo-600 dark:text-indigo-400" />
+          <div className="w-12 h-12 bg-indigo-50 rounded-xl flex items-center justify-center mb-4 border border-indigo-100">
+            <Target className="w-6 h-6 text-indigo-600" />
           </div>
-          <h1 className="text-2xl font-bold text-slate-900 dark:text-white tracking-tight">Criar Conta HitMark</h1>
-          <p className="text-slate-500 dark:text-slate-400 text-sm mt-1 text-center">O primeiro usuário cadastrado será o MASTER do sistema.</p>
+          <h1 className="text-2xl font-bold text-slate-900 tracking-tight">Criar Conta HitMark</h1>
+          <p className="text-slate-500 text-sm mt-1 text-center">O primeiro usuário cadastrado será o MASTER do sistema.</p>
         </div>
         <form onSubmit={(e) => { e.preventDefault(); onRegister(name, code); }} className="space-y-4">
           <div>
-            <label className="block text-xs font-medium text-slate-600 dark:text-slate-400 mb-1.5 uppercase tracking-wider">Nome Completo</label>
+            <label className="block text-xs font-medium text-slate-600 mb-1.5 uppercase tracking-wider">Nome Completo</label>
             <Input value={name} onChange={(e:any) => setName(e.target.value)} placeholder="Ex: João Silva" />
           </div>
           <div>
-            <label className="block text-xs font-medium text-slate-600 dark:text-slate-400 mb-1.5 uppercase tracking-wider">Código de Acesso (Senha)</label>
+            <label className="block text-xs font-medium text-slate-600 mb-1.5 uppercase tracking-wider">Código de Acesso (Senha)</label>
             <Input type="password" value={code} onChange={(e:any) => setCode(e.target.value)} placeholder="Mínimo 4 caracteres" />
           </div>
           <Button type="submit" className="w-full mt-2" size="lg">Finalizar Cadastro</Button>
         </form>
         <div className="mt-6 text-center">
-          <button onClick={onGoLogin} className="text-sm text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white font-medium transition-colors">
+          <button onClick={onGoLogin} className="text-sm text-slate-600 hover:text-slate-900 font-medium transition-colors">
             Voltar para o Login
           </button>
         </div>
@@ -310,7 +305,7 @@ function RegisterScreen({ onRegister, onGoLogin }: any) {
 }
 
 // --- MAIN APP COMPONENT ---
-function MainApp({ currentUser, onLogout, companySettings, setCompanySettings, showToast, theme, toggleTheme }: any) {
+function MainApp({ currentUser, onLogout, companySettings, setCompanySettings, showToast }: any) {
   const [activeTab, setActiveTab] = useState('dashboard');
   const [vendors, setVendors] = useState<any[]>([]);
   const [selectedVendorId, setSelectedVendorId] = useState<string>('');
@@ -387,20 +382,20 @@ function MainApp({ currentUser, onLogout, companySettings, setCompanySettings, s
         @media print {
           .print-hide { display: none !important; }
           .print-only { display: block !important; }
-          body, .dark body { background: white !important; color: black !important; }
+          body { background: white !important; color: black !important; }
           * { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
           .print-container { width: 100%; max-width: 100%; padding: 0; margin: 0; background: white !important; }
-          .bg-slate-900, .dark\\:bg-slate-900, .bg-white { background: white !important; border: 1px solid #e2e8f0 !important; color: black !important; }
-          .text-slate-200, .text-slate-400, .text-slate-500, .text-white, .dark\\:text-white { color: #334155 !important; }
+          .bg-slate-900, .bg-white { background: white !important; border: 1px solid #e2e8f0 !important; color: black !important; }
+          .text-slate-200, .text-slate-400, .text-slate-500, .text-white { color: #334155 !important; }
         }
         .print-only { display: none; }
       `}</style>
 
       {/* --- SIDEBAR --- */}
-      <aside className="w-64 bg-white dark:bg-slate-950 border-r border-slate-200 dark:border-slate-800/60 flex flex-col print-hide z-20 transition-colors">
-        <div className="h-16 flex items-center px-6 border-b border-slate-200 dark:border-slate-800/60 shrink-0">
-          <Target className="w-6 h-6 text-indigo-600 dark:text-indigo-500 mr-2" />
-          <span className="font-bold text-lg tracking-tight text-slate-900 dark:text-white">Hit<span className="text-indigo-600 dark:text-indigo-400">Mark</span></span>
+      <aside className="w-64 bg-white border-r border-slate-200 flex flex-col print-hide z-20 transition-colors">
+        <div className="h-16 flex items-center px-6 border-b border-slate-200 shrink-0">
+          <Target className="w-6 h-6 text-indigo-600 mr-2" />
+          <span className="font-bold text-lg tracking-tight text-slate-900">Hit<span className="text-indigo-600">Mark</span></span>
         </div>
         
         <nav className="flex-1 px-4 py-6 space-y-1.5 overflow-y-auto">
@@ -415,48 +410,48 @@ function MainApp({ currentUser, onLogout, companySettings, setCompanySettings, s
                 onClick={() => setActiveTab(item.id)}
                 className={`w-full flex items-center px-3 py-2.5 rounded-lg text-sm font-medium transition-all ${
                   isActive 
-                    ? 'bg-indigo-50 dark:bg-indigo-500/10 text-indigo-700 dark:text-indigo-400' 
-                    : 'text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-900 hover:text-slate-900 dark:hover:text-slate-200'
+                    ? 'bg-indigo-50 text-indigo-700' 
+                    : 'text-slate-600 hover:bg-slate-50 hover:text-slate-900'
                 }`}
               >
-                <item.icon className={`w-5 h-5 mr-3 ${isActive ? 'text-indigo-600 dark:text-indigo-400' : 'text-slate-400 dark:text-slate-500'}`} />
+                <item.icon className={`w-5 h-5 mr-3 ${isActive ? 'text-indigo-600' : 'text-slate-400'}`} />
                 {item.label}
               </button>
             );
           })}
         </nav>
 
-        <div className="p-4 border-t border-slate-200 dark:border-slate-800/60 shrink-0">
-          <div className="bg-slate-50 dark:bg-slate-900 rounded-xl p-3 border border-slate-200 dark:border-slate-800 mb-3">
+        <div className="p-4 border-t border-slate-200 shrink-0">
+          <div className="bg-slate-50 rounded-xl p-3 border border-slate-200 mb-3">
             <div className="flex items-center">
               <div className="w-8 h-8 rounded-full bg-indigo-600 text-white flex items-center justify-center font-bold text-xs uppercase shadow-inner">
                 {currentUser.name.substring(0,2)}
               </div>
               <div className="ml-3 overflow-hidden">
-                <p className="text-sm font-semibold text-slate-900 dark:text-white truncate">{currentUser.name}</p>
+                <p className="text-sm font-semibold text-slate-900 truncate">{currentUser.name}</p>
                 <div className="flex items-center mt-0.5">
                   {currentUser.role === 'MASTER' ? (
                     <Badge variant="indigo"><Shield className="w-3 h-3 mr-1"/> Master</Badge>
                   ) : (
-                    <span className="text-xs text-slate-500 dark:text-slate-400 truncate">Usuário Padrão</span>
+                    <span className="text-xs text-slate-500 truncate">Usuário Padrão</span>
                   )}
                 </div>
               </div>
             </div>
           </div>
-          <Button variant="ghost" className="w-full justify-start text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white" onClick={onLogout}>
+          <Button variant="ghost" className="w-full justify-start text-slate-600 hover:text-slate-900" onClick={onLogout}>
             <LogOut className="w-4 h-4 mr-2" /> Encerrar Sessão
           </Button>
         </div>
       </aside>
 
       {/* --- MAIN CONTENT --- */}
-      <main className="flex-1 flex flex-col min-w-0 bg-slate-50 dark:bg-slate-950 relative print-container overflow-hidden transition-colors">
+      <main className="flex-1 flex flex-col min-w-0 bg-slate-50 relative print-container overflow-hidden transition-colors">
         <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full max-w-4xl h-64 bg-indigo-600/5 blur-[120px] rounded-full pointer-events-none print-hide"></div>
         
         {/* HEADER */}
-        <header className="h-16 bg-white/80 dark:bg-slate-950/80 backdrop-blur-md border-b border-slate-200 dark:border-slate-800/60 flex items-center justify-between px-8 print-hide shrink-0 z-10 sticky top-0 transition-colors">
-          <h1 className="text-xl font-semibold text-slate-900 dark:text-white tracking-tight">
+        <header className="h-16 bg-white/80 backdrop-blur-md border-b border-slate-200 flex items-center justify-between px-8 print-hide shrink-0 z-10 sticky top-0 transition-colors">
+          <h1 className="text-xl font-semibold text-slate-900 tracking-tight">
             {activeTab === 'dashboard' && 'Dashboard de Metas'}
             {activeTab === 'vendors' && 'Gerenciamento de Equipe'}
             {activeTab === 'reports' && 'Relatórios Oficiais'}
@@ -464,9 +459,6 @@ function MainApp({ currentUser, onLogout, companySettings, setCompanySettings, s
           </h1>
           
           <div className="flex items-center space-x-4">
-            <button onClick={toggleTheme} className="p-2 text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-900 rounded-full transition-colors">
-              {theme === 'dark' ? <Sun className="w-5 h-5" /> : <Moon className="w-5 h-5" />}
-            </button>
             {(activeTab === 'dashboard' || activeTab === 'reports') && vendors.length > 0 && (
               <Select 
                 value={selectedVendorId} 
@@ -484,7 +476,7 @@ function MainApp({ currentUser, onLogout, companySettings, setCompanySettings, s
             {!canAccess(activeTab) ? (
               <div className="flex flex-col items-center justify-center py-20 text-slate-500">
                 <Lock className="w-12 h-12 mb-4 opacity-50" />
-                <h2 className="text-xl font-medium text-slate-800 dark:text-slate-300">Acesso Restrito</h2>
+                <h2 className="text-xl font-medium text-slate-800">Acesso Restrito</h2>
                 <p>Você não tem permissão para visualizar esta área.</p>
               </div>
             ) : (
@@ -497,7 +489,6 @@ function MainApp({ currentUser, onLogout, companySettings, setCompanySettings, s
                     selectedYear={selectedYear} 
                     setSelectedYear={setSelectedYear}
                     hasEditPerm={canEdit('dashboard')}
-                    theme={theme}
                   />
                 )}
                 {activeTab === 'vendors' && (
@@ -535,15 +526,15 @@ function MainApp({ currentUser, onLogout, companySettings, setCompanySettings, s
 
 // --- SUB-VIEWS ---
 
-function DashboardView({ vendors, chartData, currentMonthData, selectedYear, setSelectedYear, hasEditPerm, theme }: any) {
+function DashboardView({ vendors, chartData, currentMonthData, selectedYear, setSelectedYear, hasEditPerm }: any) {
   const annualTotal = chartData.reduce((acc: number, curr: any) => acc + curr.metaMensal, 0);
 
   if (vendors.length === 0) {
     return (
-      <Card className="p-16 text-center flex flex-col items-center justify-center border-dashed border-slate-300 dark:border-slate-800 bg-slate-50 dark:bg-slate-900/50">
-        <Users className="w-12 h-12 text-slate-400 dark:text-slate-600 mb-4" />
-        <h3 className="text-xl font-medium text-slate-900 dark:text-slate-200 mb-2">Nenhum vendedor encontrado</h3>
-        <p className="text-slate-600 dark:text-slate-400 mb-6 max-w-md">Para começar a visualizar os gráficos de metas, você precisa cadastrar a sua equipe comercial.</p>
+      <Card className="p-16 text-center flex flex-col items-center justify-center border-dashed border-slate-300 bg-slate-50">
+        <Users className="w-12 h-12 text-slate-400 mb-4" />
+        <h3 className="text-xl font-medium text-slate-900 mb-2">Nenhum vendedor encontrado</h3>
+        <p className="text-slate-600 mb-6 max-w-md">Para começar a visualizar os gráficos de metas, você precisa cadastrar a sua equipe comercial.</p>
         {hasEditPerm && <Badge variant="indigo">Vá até a aba Vendedores para cadastrar</Badge>}
       </Card>
     );
@@ -552,33 +543,33 @@ function DashboardView({ vendors, chartData, currentMonthData, selectedYear, set
   return (
     <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <Card className="p-6 bg-white dark:bg-gradient-to-br dark:from-slate-900 dark:to-slate-900/50">
+        <Card className="p-6 bg-white">
           <div className="flex justify-between items-start">
             <div>
-              <p className="text-sm font-medium text-slate-500 dark:text-slate-400 mb-1">Meta Mês Atual ({MONTHS[new Date().getMonth()]})</p>
-              <h3 className="text-3xl font-bold tracking-tight text-slate-900 dark:text-white">{formatCurrency(currentMonthData.metaMensal)}</h3>
+              <p className="text-sm font-medium text-slate-500 mb-1">Meta Mês Atual ({MONTHS[new Date().getMonth()]})</p>
+              <h3 className="text-3xl font-bold tracking-tight text-slate-900">{formatCurrency(currentMonthData.metaMensal)}</h3>
             </div>
-            <div className="p-3 bg-indigo-50 dark:bg-slate-800 rounded-xl border border-indigo-100 dark:border-slate-700"><Target className="w-5 h-5 text-indigo-600 dark:text-indigo-400" /></div>
+            <div className="p-3 bg-indigo-50 rounded-xl border border-indigo-100"><Target className="w-5 h-5 text-indigo-600" /></div>
           </div>
         </Card>
         
-        <Card className="p-6 bg-white dark:bg-gradient-to-br dark:from-slate-900 dark:to-slate-900/50">
+        <Card className="p-6 bg-white">
           <div className="flex justify-between items-start">
             <div>
-              <p className="text-sm font-medium text-slate-500 dark:text-slate-400 mb-1">Total Realizado ({MONTHS[new Date().getMonth()]})</p>
-              <h3 className="text-3xl font-bold tracking-tight text-emerald-600 dark:text-emerald-400">{formatCurrency(currentMonthData.realizado)}</h3>
-              <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">Progresso atual no mês</p>
+              <p className="text-sm font-medium text-slate-500 mb-1">Total Realizado ({MONTHS[new Date().getMonth()]})</p>
+              <h3 className="text-3xl font-bold tracking-tight text-emerald-600">{formatCurrency(currentMonthData.realizado)}</h3>
+              <p className="text-xs text-slate-500 mt-1">Progresso atual no mês</p>
             </div>
-            <div className="p-3 bg-emerald-50 dark:bg-slate-800 rounded-xl border border-emerald-100 dark:border-slate-700"><CalendarDays className="w-5 h-5 text-emerald-600 dark:text-emerald-400" /></div>
+            <div className="p-3 bg-emerald-50 rounded-xl border border-emerald-100"><CalendarDays className="w-5 h-5 text-emerald-600" /></div>
           </div>
         </Card>
 
-        <Card className="p-6 bg-slate-50 dark:bg-gradient-to-br dark:from-slate-900 dark:to-slate-900/50 relative overflow-hidden">
-          <div className="absolute top-0 right-0 p-16 bg-indigo-500/5 dark:bg-indigo-500/10 blur-3xl rounded-full"></div>
+        <Card className="p-6 bg-slate-50 relative overflow-hidden">
+          <div className="absolute top-0 right-0 p-16 bg-indigo-500/5 blur-3xl rounded-full"></div>
           <div className="flex justify-between items-start relative z-10">
             <div>
-              <p className="text-sm font-medium text-slate-500 dark:text-slate-400 mb-1">Acumulado Anual ({selectedYear})</p>
-              <h3 className="text-3xl font-bold tracking-tight text-slate-900 dark:text-white">{formatCurrency(annualTotal)}</h3>
+              <p className="text-sm font-medium text-slate-500 mb-1">Acumulado Anual ({selectedYear})</p>
+              <h3 className="text-3xl font-bold tracking-tight text-slate-900">{formatCurrency(annualTotal)}</h3>
             </div>
             <div className="p-3 bg-indigo-600 rounded-xl shadow-lg shadow-indigo-900/20"><TrendingUp className="w-5 h-5 text-white" /></div>
           </div>
@@ -588,8 +579,8 @@ function DashboardView({ vendors, chartData, currentMonthData, selectedYear, set
       <Card className="p-6">
         <div className="flex justify-between items-center mb-8">
           <div>
-            <h3 className="text-lg font-semibold text-slate-900 dark:text-white">Projeção e Desempenho Anual</h3>
-            <p className="text-sm text-slate-500 dark:text-slate-400">Análise comparativa da distribuição de metas e realizado.</p>
+            <h3 className="text-lg font-semibold text-slate-900">Projeção e Desempenho Anual</h3>
+            <p className="text-sm text-slate-500">Análise comparativa da distribuição de metas e realizado.</p>
           </div>
           <Select 
             value={selectedYear} 
@@ -602,7 +593,7 @@ function DashboardView({ vendors, chartData, currentMonthData, selectedYear, set
         <div className="h-[250px] w-full">
           <ResponsiveContainer width="100%" height="100%">
             <ComposedChart data={chartData} margin={{ top: 10, right: 10, bottom: 0, left: 10 }}>
-              <CartesianGrid strokeDasharray="3 3" vertical={false} stroke={theme === 'dark' ? '#334155' : '#e2e8f0'} />
+              <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#e2e8f0" />
               <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{fill: '#64748b', fontSize: 12}} dy={10} />
               <YAxis 
                 yAxisId="left" 
@@ -613,15 +604,15 @@ function DashboardView({ vendors, chartData, currentMonthData, selectedYear, set
                 dx={-10}
               />
               <RechartsTooltip 
-                cursor={{fill: theme === 'dark' ? '#1e293b' : '#f1f5f9'}}
-                contentStyle={{ backgroundColor: theme === 'dark' ? '#0f172a' : '#ffffff', borderRadius: '8px', border: `1px solid ${theme === 'dark' ? '#334155' : '#e2e8f0'}`, boxShadow: '0 10px 15px -3px rgb(0 0 0 / 0.1)' }}
+                cursor={{fill: '#f1f5f9'}}
+                contentStyle={{ backgroundColor: '#ffffff', borderRadius: '8px', border: '1px solid #e2e8f0', boxShadow: '0 10px 15px -3px rgb(0 0 0 / 0.1)' }}
                 formatter={(value: number) => [formatCurrency(value), '']}
-                labelStyle={{ color: theme === 'dark' ? '#f8fafc' : '#0f172a', fontWeight: 'bold', marginBottom: '8px' }}
-                itemStyle={{ color: theme === 'dark' ? '#cbd5e1' : '#475569' }}
+                labelStyle={{ color: '#0f172a', fontWeight: 'bold', marginBottom: '8px' }}
+                itemStyle={{ color: '#475569' }}
               />
               <Legend wrapperStyle={{ paddingTop: '10px' }} />
               <Bar yAxisId="left" dataKey="metaMensal" name="Meta Mensal" fill="#4f46e5" radius={[4, 4, 0, 0]} maxBarSize={40} />
-              <Line yAxisId="left" type="monotone" dataKey="realizado" name="Realizado" stroke="#10b981" strokeWidth={3} dot={{r: 4, fill: theme==='dark'?'#0f172a':'#ffffff', strokeWidth: 2, stroke: '#10b981'}} activeDot={{r: 6}} />
+              <Line yAxisId="left" type="monotone" dataKey="realizado" name="Realizado" stroke="#10b981" strokeWidth={3} dot={{r: 4, fill: '#ffffff', strokeWidth: 2, stroke: '#10b981'}} activeDot={{r: 6}} />
             </ComposedChart>
           </ResponsiveContainer>
         </div>
@@ -685,10 +676,10 @@ function VendorsManager({ vendors, currentUser, currentYear, showToast, hasEditP
 
   return (
     <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
-      <div className="flex justify-between items-center bg-white dark:bg-slate-900 p-4 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm">
+      <div className="flex justify-between items-center bg-white p-4 rounded-xl border border-slate-200 shadow-sm">
         <div>
-          <h2 className="text-lg font-semibold text-slate-900 dark:text-white">Equipe Comercial</h2>
-          <p className="text-sm text-slate-500 dark:text-slate-400">Gerencie seus vendedores, atribua metas e lance resultados.</p>
+          <h2 className="text-lg font-semibold text-slate-900">Equipe Comercial</h2>
+          <p className="text-sm text-slate-500">Gerencie seus vendedores, atribua metas e lance resultados.</p>
         </div>
         {hasEditPerm && (
           <Button onClick={() => setIsAdding(!isAdding)}>
@@ -698,10 +689,10 @@ function VendorsManager({ vendors, currentUser, currentYear, showToast, hasEditP
       </div>
 
       {isAdding && hasEditPerm && (
-        <Card className="p-6 bg-slate-50 dark:bg-slate-900 border-indigo-500/30 border-2 border-dashed">
+        <Card className="p-6 bg-slate-50 border-indigo-500/30 border-2 border-dashed">
           <form onSubmit={handleAddVendor} className="flex gap-4 items-end">
             <div className="flex-1">
-              <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">Nome Completo do Vendedor</label>
+              <label className="block text-sm font-medium text-slate-700 mb-2">Nome Completo do Vendedor</label>
               <Input autoFocus value={newVendorName} onChange={(e:any) => setNewVendorName(e.target.value)} placeholder="Ex: Carlos Eduardo" required />
             </div>
             <Button type="submit">Salvar Vendedor</Button>
@@ -711,18 +702,18 @@ function VendorsManager({ vendors, currentUser, currentYear, showToast, hasEditP
 
       <div className="grid grid-cols-1 gap-4">
         {vendors.map(vendor => (
-          <Card key={vendor.id} className="overflow-visible transition-all hover:border-slate-300 dark:hover:border-slate-700">
+          <Card key={vendor.id} className="overflow-visible transition-all hover:border-slate-300">
             <div 
-              className="p-5 flex justify-between items-center cursor-pointer hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors"
+              className="p-5 flex justify-between items-center cursor-pointer hover:bg-slate-50 transition-colors"
               onClick={() => { setEditingVendor(editingVendor === vendor.id ? null : vendor.id); setEditorTab('goals'); }}
             >
               <div className="flex items-center">
-                <div className="w-12 h-12 rounded-xl bg-slate-100 dark:bg-slate-800 text-indigo-600 dark:text-indigo-400 flex items-center justify-center font-bold text-lg border border-slate-200 dark:border-slate-700 mr-4 shadow-inner">
+                <div className="w-12 h-12 rounded-xl bg-slate-100 text-indigo-600 flex items-center justify-center font-bold text-lg border border-slate-200 mr-4 shadow-inner">
                   {vendor.name.charAt(0)}
                 </div>
                 <div>
-                  <h3 className="font-semibold text-slate-900 dark:text-white text-lg">{vendor.name}</h3>
-                  <p className="text-sm text-slate-500 dark:text-slate-400">Id: {vendor.id.split('-')[0]} • Cadastrado em {new Date(vendor.createdAt).toLocaleDateString()}</p>
+                  <h3 className="font-semibold text-slate-900 text-lg">{vendor.name}</h3>
+                  <p className="text-sm text-slate-500">Id: {vendor.id.split('-')[0]} • Cadastrado em {new Date(vendor.createdAt).toLocaleDateString()}</p>
                 </div>
               </div>
               <div className="flex items-center gap-2">
@@ -734,21 +725,21 @@ function VendorsManager({ vendors, currentUser, currentYear, showToast, hasEditP
                     <Trash2 className="w-4 h-4" />
                   </Button>
                 )}
-                <ChevronDown className={`w-5 h-5 text-slate-400 dark:text-slate-500 transition-transform ${editingVendor === vendor.id ? 'rotate-180' : ''}`} />
+                <ChevronDown className={`w-5 h-5 text-slate-400 transition-transform ${editingVendor === vendor.id ? 'rotate-180' : ''}`} />
               </div>
             </div>
 
             {editingVendor === vendor.id && (
-              <div className="border-t border-slate-200 dark:border-slate-800 p-6 bg-slate-50 dark:bg-slate-950/50">
-                <div className="flex gap-6 mb-6 border-b border-slate-200 dark:border-slate-800">
+              <div className="border-t border-slate-200 p-6 bg-slate-50">
+                <div className="flex gap-6 mb-6 border-b border-slate-200">
                   <button 
-                    className={`pb-3 text-sm font-medium transition-colors ${editorTab === 'goals' ? 'border-b-2 border-indigo-500 text-indigo-600 dark:text-indigo-400' : 'text-slate-500 hover:text-slate-700 dark:hover:text-slate-300'}`}
+                    className={`pb-3 text-sm font-medium transition-colors ${editorTab === 'goals' ? 'border-b-2 border-indigo-500 text-indigo-600' : 'text-slate-500 hover:text-slate-700'}`}
                     onClick={() => setEditorTab('goals')}
                   >
                     Metas Anuais (R$)
                   </button>
                   <button 
-                    className={`pb-3 text-sm font-medium transition-colors ${editorTab === 'actuals' ? 'border-b-2 border-emerald-500 text-emerald-600 dark:text-emerald-400' : 'text-slate-500 hover:text-slate-700 dark:hover:text-slate-300'}`}
+                    className={`pb-3 text-sm font-medium transition-colors ${editorTab === 'actuals' ? 'border-b-2 border-emerald-500 text-emerald-600' : 'text-slate-500 hover:text-slate-700'}`}
                     onClick={() => setEditorTab('actuals')}
                   >
                     Resultados Semanais (Feito)
@@ -757,10 +748,10 @@ function VendorsManager({ vendors, currentUser, currentYear, showToast, hasEditP
 
                 <div className="mb-4 flex justify-between items-center">
                   <div>
-                    <h4 className="font-medium text-slate-900 dark:text-white">
+                    <h4 className="font-medium text-slate-900">
                       {editorTab === 'goals' ? `Grade de Metas (${currentYear})` : `Lançamento de Resultados (${currentYear})`}
                     </h4>
-                    <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">Os valores são salvos automaticamente.</p>
+                    <p className="text-xs text-slate-500 mt-1">Os valores são salvos automaticamente.</p>
                   </div>
                   {editorTab === 'actuals' && (
                     <Select value={actualsMonth} onChange={(e:any) => setActualsMonth(Number(e.target.value))} options={MONTHS_FULL.map((m,i)=>({label: m, value: i+1}))} className="w-40 h-8 text-xs" />
@@ -774,9 +765,9 @@ function VendorsManager({ vendors, currentUser, currentYear, showToast, hasEditP
                       const currentVal = vendor.goals?.[monthKey] || '';
                       return (
                         <div key={month} className="space-y-1.5">
-                          <label className="text-xs font-semibold text-slate-600 dark:text-slate-400 ml-1 uppercase tracking-wider">{month}</label>
+                          <label className="text-xs font-semibold text-slate-600 ml-1 uppercase tracking-wider">{month}</label>
                           <div className="relative">
-                            <span className="absolute left-3 top-2.5 text-slate-400 dark:text-slate-500 text-sm font-medium">R$</span>
+                            <span className="absolute left-3 top-2.5 text-slate-400 text-sm font-medium">R$</span>
                             <Input type="text" className="pl-9 font-mono text-sm" placeholder="0.00" defaultValue={currentVal} disabled={!hasEditPerm}
                               onBlur={(e:any) => { if(e.target.value !== String(currentVal)) handleUpdateGoal(vendor.id, monthKey, e.target.value); }}
                             />
@@ -794,10 +785,10 @@ function VendorsManager({ vendors, currentUser, currentYear, showToast, hasEditP
                        const currentVal = vendor.actuals?.[monthKey]?.[i] || '';
                        return (
                           <div key={i} className="space-y-1.5">
-                            <label className="text-xs font-semibold text-emerald-600 dark:text-emerald-400 ml-1 uppercase tracking-wider">Semana {i+1}</label>
+                            <label className="text-xs font-semibold text-emerald-600 ml-1 uppercase tracking-wider">Semana {i+1}</label>
                             <div className="relative">
-                              <span className="absolute left-3 top-2.5 text-slate-400 dark:text-slate-500 text-sm font-medium">R$</span>
-                              <Input type="text" className="pl-9 font-mono text-sm border-emerald-200 dark:border-emerald-900/50 focus:ring-emerald-500" placeholder="0.00" defaultValue={currentVal} disabled={!hasEditPerm}
+                              <span className="absolute left-3 top-2.5 text-slate-400 text-sm font-medium">R$</span>
+                              <Input type="text" className="pl-9 font-mono text-sm border-emerald-200 focus:ring-emerald-500" placeholder="0.00" defaultValue={currentVal} disabled={!hasEditPerm}
                                 onBlur={(e:any) => { if(e.target.value !== String(currentVal)) handleUpdateActual(vendor.id, monthKey, i, e.target.value); }}
                               />
                             </div>
@@ -811,7 +802,7 @@ function VendorsManager({ vendors, currentUser, currentYear, showToast, hasEditP
           </Card>
         ))}
         {vendors.length === 0 && !isAdding && (
-          <div className="text-center py-16 text-slate-500 border border-dashed border-slate-300 dark:border-slate-800 rounded-xl">Nenhum vendedor cadastrado.</div>
+          <div className="text-center py-16 text-slate-500 border border-dashed border-slate-300 rounded-xl">Nenhum vendedor cadastrado.</div>
         )}
       </div>
     </div>
@@ -824,10 +815,10 @@ function ReportsView({ vendor, year, companySettings }: any) {
 
   if (!vendor) {
     return (
-      <Card className="p-16 text-center border-dashed border-slate-300 dark:border-slate-800 bg-slate-50 dark:bg-slate-900/50">
-        <Printer className="w-12 h-12 text-slate-400 dark:text-slate-600 mb-4 mx-auto" />
-        <h3 className="text-xl font-medium text-slate-900 dark:text-slate-200 mb-2">Selecione um vendedor</h3>
-        <p className="text-slate-600 dark:text-slate-400">Utilize o seletor no cabeçalho para gerar o relatório oficial de impressão.</p>
+      <Card className="p-16 text-center border-dashed border-slate-300 bg-slate-50">
+        <Printer className="w-12 h-12 text-slate-400 mb-4 mx-auto" />
+        <h3 className="text-xl font-medium text-slate-900 mb-2">Selecione um vendedor</h3>
+        <p className="text-slate-600">Utilize o seletor no cabeçalho para gerar o relatório oficial de impressão.</p>
       </Card>
     );
   }
@@ -851,10 +842,10 @@ function ReportsView({ vendor, year, companySettings }: any) {
 
   return (
     <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500 relative min-h-[600px]">
-      <div className="flex flex-col sm:flex-row justify-between items-center bg-white dark:bg-slate-900 p-4 rounded-xl border border-slate-200 dark:border-slate-800 print-hide gap-4">
+      <div className="flex flex-col sm:flex-row justify-between items-center bg-white p-4 rounded-xl border border-slate-200 print-hide gap-4">
         <div>
-          <h2 className="text-lg font-semibold text-slate-900 dark:text-white">Relatório Mensal do Vendedor</h2>
-          <p className="text-sm text-slate-500 dark:text-slate-400">Layout de impressão focado no detalhamento semanal.</p>
+          <h2 className="text-lg font-semibold text-slate-900">Relatório Mensal do Vendedor</h2>
+          <p className="text-sm text-slate-500">Layout de impressão focado no detalhamento semanal.</p>
         </div>
         <div className="flex gap-3">
           <Select value={reportMonth} onChange={(e:any)=>setReportMonth(Number(e.target.value))} options={MONTHS_FULL.map((m,i)=>({label: m, value: i+1}))} className="w-40" />
@@ -908,7 +899,7 @@ function ReportsView({ vendor, year, companySettings }: any) {
         </div>
 
         {/* SUMMARY CARDS / FOOTER */}
-        <div className="grid grid-cols-4 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
             <div className="bg-slate-50 p-4 rounded-lg border border-slate-200 text-center">
               <p className="text-xs text-slate-500 font-bold uppercase mb-1">Meta do Mês</p>
               <p className="text-lg font-mono font-bold text-slate-900">{formatCurrency(monthlyGoal)}</p>
@@ -976,15 +967,15 @@ function SettingsManager({ companySettings, setCompanySettings, showToast, curre
     <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
       <Card className="p-6">
         <div className="flex items-center gap-3 mb-6">
-          <div className="p-2 bg-indigo-50 dark:bg-indigo-500/10 rounded-lg"><Building className="w-5 h-5 text-indigo-600 dark:text-indigo-400"/></div>
+          <div className="p-2 bg-indigo-50 rounded-lg"><Building className="w-5 h-5 text-indigo-600"/></div>
           <div>
-            <h3 className="text-lg font-semibold text-slate-900 dark:text-white">Configurações da Empresa</h3>
-            <p className="text-sm text-slate-500 dark:text-slate-400">Define os dados globais que aparecerão nos relatórios.</p>
+            <h3 className="text-lg font-semibold text-slate-900">Configurações da Empresa</h3>
+            <p className="text-sm text-slate-500">Define os dados globais que aparecerão nos relatórios.</p>
           </div>
         </div>
         <div className="flex gap-4 max-w-xl">
           <div className="flex-1">
-            <label className="block text-xs font-medium text-slate-500 dark:text-slate-400 mb-1.5 uppercase">Nome da Empresa (Razão Social ou Fantasia)</label>
+            <label className="block text-xs font-medium text-slate-500 mb-1.5 uppercase">Nome da Empresa (Razão Social ou Fantasia)</label>
             <Input value={companyNameInput} onChange={(e:any) => setCompanyNameInput(e.target.value)} />
           </div>
           <div className="flex items-end">
@@ -995,31 +986,31 @@ function SettingsManager({ companySettings, setCompanySettings, showToast, curre
 
       <Card className="p-6">
         <div className="flex items-center gap-3 mb-6">
-          <div className="p-2 bg-emerald-50 dark:bg-emerald-500/10 rounded-lg"><Shield className="w-5 h-5 text-emerald-600 dark:text-emerald-400"/></div>
+          <div className="p-2 bg-emerald-50 rounded-lg"><Shield className="w-5 h-5 text-emerald-600"/></div>
           <div>
-            <h3 className="text-lg font-semibold text-slate-900 dark:text-white">Controle de Acesso (ACL) e Usuários</h3>
-            <p className="text-sm text-slate-500 dark:text-slate-400">Gerencie níveis de acesso, códigos e papéis de todos os usuários do sistema.</p>
+            <h3 className="text-lg font-semibold text-slate-900">Controle de Acesso (ACL) e Usuários</h3>
+            <p className="text-sm text-slate-500">Gerencie níveis de acesso, códigos e papéis de todos os usuários do sistema.</p>
           </div>
         </div>
 
         <div className="space-y-6">
           {users.map(u => (
-            <div key={u.id} className="bg-slate-50 dark:bg-slate-950 p-6 rounded-xl border border-slate-200 dark:border-slate-800 relative">
+            <div key={u.id} className="bg-slate-50 p-6 rounded-xl border border-slate-200 relative">
               {u.role === 'MASTER' && (
                 <div className="absolute top-4 right-4"><Badge variant="indigo"><Shield className="w-3 h-3 mr-1"/> Master Access</Badge></div>
               )}
               
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6 pr-24">
                 <div>
-                  <label className="block text-xs font-medium text-slate-500 dark:text-slate-400 mb-1.5 uppercase">Nome do Usuário</label>
+                  <label className="block text-xs font-medium text-slate-500 mb-1.5 uppercase">Nome do Usuário</label>
                   <Input defaultValue={u.name} onBlur={(e:any) => { if(e.target.value !== u.name) handleUpdateUser(u.id, 'name', e.target.value) }} />
                 </div>
                 <div>
-                  <label className="block text-xs font-medium text-slate-500 dark:text-slate-400 mb-1.5 uppercase">Redefinir Senha</label>
+                  <label className="block text-xs font-medium text-slate-500 mb-1.5 uppercase">Redefinir Senha</label>
                   <Input type="password" placeholder="••••••••" onBlur={(e:any) => { if(e.target.value.trim() !== '') { handleUpdateUser(u.id, 'code', e.target.value); e.target.value = ''; } }} />
                 </div>
                 <div>
-                  <label className="block text-xs font-medium text-slate-500 dark:text-slate-400 mb-1.5 uppercase">Papel Global</label>
+                  <label className="block text-xs font-medium text-slate-500 mb-1.5 uppercase">Papel Global</label>
                   <Select 
                     value={u.role} 
                     onChange={(e:any) => handleUpdateUser(u.id, 'role', e.target.value)}
@@ -1029,12 +1020,12 @@ function SettingsManager({ companySettings, setCompanySettings, showToast, curre
               </div>
 
               {u.role !== 'MASTER' && (
-                <div className="border-t border-slate-200 dark:border-slate-800 pt-4">
-                  <h4 className="text-xs font-semibold text-slate-600 dark:text-slate-400 uppercase mb-3">Permissões de Módulos</h4>
+                <div className="border-t border-slate-200 pt-4">
+                  <h4 className="text-xs font-semibold text-slate-600 uppercase mb-3">Permissões de Módulos</h4>
                   <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                     {['dashboard', 'vendors', 'reports'].map(tab => (
                       <div key={tab}>
-                        <label className="block text-xs text-slate-600 dark:text-slate-500 mb-1 capitalize">{tab}</label>
+                        <label className="block text-xs text-slate-600 mb-1 capitalize">{tab}</label>
                         <Select 
                           className="h-8 text-xs"
                           value={u.permissions?.[tab] || 'none'}
