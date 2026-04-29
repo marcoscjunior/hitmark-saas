@@ -1,6 +1,17 @@
 @import "tailwindcss";
 
 @theme {
-  /* Isso ensina o Tailwind 4 a trocar as cores quando a classe .dark estiver ativa */
+  /* Configuração crucial para o Tailwind 4 aceitar a troca manual */
   --dark-mode: selector(.dark);
+}
+
+/* Ajuste base para garantir que o fundo muda mesmo que o body tenha cor padrão */
+:root {
+  background-color: #f8fafc; /* slate-50 */
+  color: #0f172a; /* slate-900 */
+}
+
+.dark {
+  background-color: #020617; /* slate-950 */
+  color: #f1f5f9; /* slate-200 */
 }
