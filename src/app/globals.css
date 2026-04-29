@@ -1,1 +1,6 @@
 @import "tailwindcss";
+
+@theme {
+  /* Isso ensina o Tailwind 4 a trocar as cores quando a classe .dark estiver ativa */
+  --dark-mode: selector(.dark);
+}
