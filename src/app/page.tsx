@@ -79,14 +79,14 @@ const Select = ({ value, onChange, options, className = '', disabled = false }: 
   </div>
 );
 
-const Badge = ({ children, variant = 'default' }: any) => {
+const Badge = ({ children, variant = 'default', className = '' }: any) => {
   const variants = {
     default: "bg-slate-100 text-slate-700",
     success: "bg-emerald-500/10 text-emerald-600 border border-emerald-500/20",
     warning: "bg-amber-500/10 text-amber-600 border border-amber-500/20",
     indigo: "bg-indigo-500/10 text-indigo-600 border border-indigo-500/20"
   };
-  return <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium transition-colors ${variants[variant as keyof typeof variants]}`}>{children}</span>;
+  return <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-[10px] md:text-xs font-medium transition-colors ${variants[variant as keyof typeof variants]} ${className}`}>{children}</span>;
 }
 
 // --- TOAST SYSTEM ---
@@ -141,9 +141,9 @@ export default function App() {
         const userData: any = { id: foundUserDoc.id, ...(foundUserDoc.data() as any) };
         setCurrentUser(userData);
         setView('app');
-        showToast(`Bem-vindo(a) de volta, ${userData.name}!`);
+        showToast(`Bem-vindo(a), ${userData.name.split(' ')[0]}!`);
       } else {
-        showToast("Código inválido ou não encontrado", 'error');
+        showToast("Código inválido", 'error');
       }
     } catch (err) {
       showToast("Erro ao tentar fazer login", 'error');
@@ -195,41 +195,36 @@ export default function App() {
 
   if (isInitializing) {
     return (
-      <div className="w-full min-h-screen">
-        <div className="min-h-screen bg-slate-50 flex items-center justify-center">
-          <div className="flex flex-col items-center">
-            <Target className="w-12 h-12 text-indigo-500 animate-pulse mb-4" />
-            <p className="text-slate-500 font-medium">Inicializando HitMark...</p>
-          </div>
+      <div className="w-full min-h-screen bg-slate-50 flex items-center justify-center p-4">
+        <div className="flex flex-col items-center">
+          <Target className="w-12 h-12 text-indigo-500 animate-pulse mb-4" />
+          <p className="text-slate-500 font-medium text-sm md:text-base">Inicializando HitMark...</p>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="w-full min-h-screen">
-      <div className="min-h-screen bg-slate-50 text-slate-900 font-sans selection:bg-indigo-500/30 transition-colors">
-        
-        {toast.type && (
-          <div className={`fixed top-4 right-4 z-50 px-4 py-3 rounded-lg shadow-2xl border flex items-center animate-in slide-in-from-top-2 ${toast.type === 'success' ? 'bg-emerald-50 border-emerald-200 text-emerald-700' : 'bg-red-50 border-red-200 text-red-700'}`}>
-            {toast.type === 'success' ? <CheckCircle2 className="w-5 h-5 mr-2" /> : <AlertCircle className="w-5 h-5 mr-2" />}
-            <span className="text-sm font-medium">{toast.message}</span>
-          </div>
-        )}
+    <div className="w-full min-h-screen bg-slate-50 text-slate-900 font-sans selection:bg-indigo-500/30">
+      {toast.type && (
+        <div className={`fixed top-4 left-1/2 -translate-x-1/2 w-[90%] max-w-sm md:w-auto md:left-auto md:translate-x-0 md:right-4 z-50 px-4 py-3 rounded-lg shadow-2xl border flex items-center animate-in slide-in-from-top-2 ${toast.type === 'success' ? 'bg-emerald-50 border-emerald-200 text-emerald-700' : 'bg-red-50 border-red-200 text-red-700'}`}>
+          {toast.type === 'success' ? <CheckCircle2 className="w-5 h-5 mr-2 shrink-0" /> : <AlertCircle className="w-5 h-5 mr-2 shrink-0" />}
+          <span className="text-sm font-medium">{toast.message}</span>
+        </div>
+      )}
 
-        {view === 'login' && <LoginScreen onLogin={handleLogin} onGoRegister={() => setView('register')} />}
-        {view === 'register' && <RegisterScreen onRegister={handleRegister} onGoLogin={() => setView('login')} />}
-        
-        {view === 'app' && currentUser && (
-          <MainApp 
-            currentUser={currentUser} 
-            onLogout={handleLogout} 
-            companySettings={companySettings}
-            setCompanySettings={setCompanySettings}
-            showToast={showToast}
-          />
-        )}
-      </div>
+      {view === 'login' && <LoginScreen onLogin={handleLogin} onGoRegister={() => setView('register')} />}
+      {view === 'register' && <RegisterScreen onRegister={handleRegister} onGoLogin={() => setView('login')} />}
+      
+      {view === 'app' && currentUser && (
+        <MainApp 
+          currentUser={currentUser} 
+          onLogout={handleLogout} 
+          companySettings={companySettings}
+          setCompanySettings={setCompanySettings}
+          showToast={showToast}
+        />
+      )}
     </div>
   );
 }
@@ -240,21 +235,21 @@ function LoginScreen({ onLogin, onGoRegister }: any) {
   const [code, setCode] = useState('');
   return (
     <div className="min-h-screen flex items-center justify-center p-4 relative overflow-hidden">
-      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] bg-indigo-600/10 rounded-full blur-[120px] pointer-events-none"></div>
-      <Card className="w-full max-w-md p-8 relative z-10 border-slate-200 bg-white/80 backdrop-blur-xl">
+      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[150vw] h-[150vw] md:w-[500px] md:h-[500px] bg-indigo-600/10 rounded-full blur-[100px] md:blur-[120px] pointer-events-none"></div>
+      <Card className="w-full max-w-md p-6 md:p-8 relative z-10 border-slate-200 bg-white/80 backdrop-blur-xl">
         <div className="flex flex-col items-center mb-8">
           <div className="w-12 h-12 bg-indigo-50 rounded-xl flex items-center justify-center mb-4 border border-indigo-100">
             <Target className="w-6 h-6 text-indigo-600" />
           </div>
           <h1 className="text-2xl font-bold text-slate-900 tracking-tight">HitMark SaaS</h1>
-          <p className="text-slate-500 text-sm mt-1">Acesso ao painel corporativo</p>
+          <p className="text-slate-500 text-sm mt-1 text-center">Acesso ao painel corporativo</p>
         </div>
         <form onSubmit={(e) => { e.preventDefault(); onLogin(code); }} className="space-y-4">
           <div>
             <label className="block text-xs font-medium text-slate-600 mb-1.5 uppercase tracking-wider">Código de Acesso</label>
             <div className="relative">
               <Key className="absolute left-3 top-2.5 h-5 w-5 text-slate-400" />
-              <Input type="password" value={code} onChange={(e:any) => setCode(e.target.value)} className="pl-10" placeholder="Digite seu código" autoFocus />
+              <Input type="password" inputMode="numeric" value={code} onChange={(e:any) => setCode(e.target.value)} className="pl-10" placeholder="Digite seu código" autoFocus />
             </div>
           </div>
           <Button type="submit" className="w-full" size="lg">Entrar no Sistema</Button>
@@ -274,14 +269,14 @@ function RegisterScreen({ onRegister, onGoLogin }: any) {
   const [code, setCode] = useState('');
   return (
     <div className="min-h-screen flex items-center justify-center p-4 relative overflow-hidden">
-      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] bg-indigo-600/10 rounded-full blur-[120px] pointer-events-none"></div>
-      <Card className="w-full max-w-md p-8 relative z-10 border-slate-200 bg-white/80 backdrop-blur-xl">
-        <div className="flex flex-col items-center mb-8">
+      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[150vw] h-[150vw] md:w-[500px] md:h-[500px] bg-indigo-600/10 rounded-full blur-[100px] md:blur-[120px] pointer-events-none"></div>
+      <Card className="w-full max-w-md p-6 md:p-8 relative z-10 border-slate-200 bg-white/80 backdrop-blur-xl">
+        <div className="flex flex-col items-center mb-6 md:mb-8">
           <div className="w-12 h-12 bg-indigo-50 rounded-xl flex items-center justify-center mb-4 border border-indigo-100">
             <Target className="w-6 h-6 text-indigo-600" />
           </div>
-          <h1 className="text-2xl font-bold text-slate-900 tracking-tight">Criar Conta HitMark</h1>
-          <p className="text-slate-500 text-sm mt-1 text-center">O primeiro usuário cadastrado será o MASTER do sistema.</p>
+          <h1 className="text-2xl font-bold text-slate-900 tracking-tight text-center">Criar Conta HitMark</h1>
+          <p className="text-slate-500 text-[13px] mt-2 text-center leading-relaxed">O primeiro usuário cadastrado será o MASTER do sistema.</p>
         </div>
         <form onSubmit={(e) => { e.preventDefault(); onRegister(name, code); }} className="space-y-4">
           <div>
@@ -289,8 +284,8 @@ function RegisterScreen({ onRegister, onGoLogin }: any) {
             <Input value={name} onChange={(e:any) => setName(e.target.value)} placeholder="Ex: João Silva" />
           </div>
           <div>
-            <label className="block text-xs font-medium text-slate-600 mb-1.5 uppercase tracking-wider">Código de Acesso (Senha)</label>
-            <Input type="password" value={code} onChange={(e:any) => setCode(e.target.value)} placeholder="Mínimo 4 caracteres" />
+            <label className="block text-xs font-medium text-slate-600 mb-1.5 uppercase tracking-wider">Código (Senha Numérica)</label>
+            <Input type="password" inputMode="numeric" value={code} onChange={(e:any) => setCode(e.target.value)} placeholder="Mínimo 4 caracteres" />
           </div>
           <Button type="submit" className="w-full mt-2" size="lg">Finalizar Cadastro</Button>
         </form>
@@ -373,11 +368,11 @@ function MainApp({ currentUser, onLogout, companySettings, setCompanySettings, s
     { id: 'dashboard', icon: LayoutDashboard, label: 'Visão Geral' },
     { id: 'vendors', icon: Users, label: 'Vendedores' },
     { id: 'reports', icon: Printer, label: 'Relatórios' },
-    { id: 'settings', icon: Settings, label: 'Configurações', isMasterOnly: true },
+    { id: 'settings', icon: Settings, label: 'Ajustes', isMasterOnly: true },
   ];
 
   return (
-    <div className="flex h-screen overflow-hidden">
+    <div className="flex h-screen overflow-hidden bg-slate-50 flex-col md:flex-row">
       <style>{`
         @media print {
           .print-hide { display: none !important; }
@@ -391,8 +386,8 @@ function MainApp({ currentUser, onLogout, companySettings, setCompanySettings, s
         .print-only { display: none; }
       `}</style>
 
-      {/* --- SIDEBAR --- */}
-      <aside className="w-64 bg-white border-r border-slate-200 flex flex-col print-hide z-20 transition-colors">
+      {/* --- SIDEBAR DESKTOP --- */}
+      <aside className="hidden md:flex w-64 bg-white border-r border-slate-200 flex-col print-hide z-20">
         <div className="h-16 flex items-center px-6 border-b border-slate-200 shrink-0">
           <Target className="w-6 h-6 text-indigo-600 mr-2" />
           <span className="font-bold text-lg tracking-tight text-slate-900">Hit<span className="text-indigo-600">Mark</span></span>
@@ -433,51 +428,57 @@ function MainApp({ currentUser, onLogout, companySettings, setCompanySettings, s
                   {currentUser.role === 'MASTER' ? (
                     <Badge variant="indigo"><Shield className="w-3 h-3 mr-1"/> Master</Badge>
                   ) : (
-                    <span className="text-xs text-slate-500 truncate">Usuário Padrão</span>
+                    <span className="text-xs text-slate-500 truncate">Usuário</span>
                   )}
                 </div>
               </div>
             </div>
           </div>
           <Button variant="ghost" className="w-full justify-start text-slate-600 hover:text-slate-900" onClick={onLogout}>
-            <LogOut className="w-4 h-4 mr-2" /> Encerrar Sessão
+            <LogOut className="w-4 h-4 mr-2" /> Sair
           </Button>
         </div>
       </aside>
 
       {/* --- MAIN CONTENT --- */}
-      <main className="flex-1 flex flex-col min-w-0 bg-slate-50 relative print-container overflow-hidden transition-colors">
+      <main className="flex-1 flex flex-col min-w-0 relative print-container overflow-hidden">
         <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full max-w-4xl h-64 bg-indigo-600/5 blur-[120px] rounded-full pointer-events-none print-hide"></div>
         
-        {/* HEADER */}
-        <header className="h-16 bg-white/80 backdrop-blur-md border-b border-slate-200 flex items-center justify-between px-8 print-hide shrink-0 z-10 sticky top-0 transition-colors">
-          <h1 className="text-xl font-semibold text-slate-900 tracking-tight">
-            {activeTab === 'dashboard' && 'Dashboard de Metas'}
-            {activeTab === 'vendors' && 'Gerenciamento de Equipe'}
-            {activeTab === 'reports' && 'Relatórios Oficiais'}
-            {activeTab === 'settings' && 'Painel de Controle Master'}
-          </h1>
+        {/* HEADER RESPONSIVO */}
+        <header className="py-3 md:h-16 md:py-0 bg-white/80 backdrop-blur-md border-b border-slate-200 flex flex-col md:flex-row items-center justify-between px-4 md:px-8 print-hide shrink-0 z-10 sticky top-0 gap-3 md:gap-0">
+          <div className="flex w-full md:w-auto items-center justify-between">
+            <h1 className="text-lg md:text-xl font-semibold text-slate-900 tracking-tight">
+              {activeTab === 'dashboard' && 'Dashboard'}
+              {activeTab === 'vendors' && 'Equipe'}
+              {activeTab === 'reports' && 'Relatórios'}
+              {activeTab === 'settings' && 'Painel Master'}
+            </h1>
+            <button onClick={onLogout} className="md:hidden p-2 bg-slate-100 text-slate-500 hover:bg-slate-200 rounded-lg transition-colors">
+              <LogOut className="w-4 h-4" />
+            </button>
+          </div>
           
-          <div className="flex items-center space-x-4">
+          <div className="w-full md:w-auto flex items-center">
             {(activeTab === 'dashboard' || activeTab === 'reports') && vendors.length > 0 && (
               <Select 
                 value={selectedVendorId} 
                 onChange={(e: any) => setSelectedVendorId(e.target.value)}
                 options={vendors.map(v => ({ value: v.id, label: v.name }))}
-                className="w-64 shadow-sm"
+                className="w-full md:w-64 shadow-sm"
               />
             )}
           </div>
         </header>
 
         {/* CONTENT AREA */}
-        <div className="flex-1 overflow-auto p-8 relative z-0 print:p-0 print:overflow-visible">
-          <div className="max-w-6xl mx-auto space-y-8">
+        {/* pb-24 adicionado no mobile para não esconder conteúdo atrás da barra de navegação inferior */}
+        <div className="flex-1 overflow-auto p-4 pb-24 md:p-8 md:pb-8 relative z-0 print:p-0 print:overflow-visible">
+          <div className="max-w-6xl mx-auto space-y-6 md:space-y-8">
             {!canAccess(activeTab) ? (
               <div className="flex flex-col items-center justify-center py-20 text-slate-500">
                 <Lock className="w-12 h-12 mb-4 opacity-50" />
                 <h2 className="text-xl font-medium text-slate-800">Acesso Restrito</h2>
-                <p>Você não tem permissão para visualizar esta área.</p>
+                <p className="text-center px-4">Você não tem permissão para visualizar esta área.</p>
               </div>
             ) : (
               <>
@@ -520,6 +521,30 @@ function MainApp({ currentUser, onLogout, companySettings, setCompanySettings, s
           </div>
         </div>
       </main>
+
+      {/* --- MOBILE BOTTOM NAVIGATION --- */}
+      <nav className="md:hidden fixed bottom-0 w-full bg-white border-t border-slate-200 flex justify-around items-center h-16 px-2 z-50 shadow-[0_-10px_40px_rgba(0,0,0,0.05)] pb-safe">
+        {NAVIGATION.map((item) => {
+          if (item.isMasterOnly && currentUser.role !== 'MASTER') return null;
+          if (!item.isMasterOnly && !canAccess(item.id)) return null;
+          
+          const isActive = activeTab === item.id;
+          return (
+            <button
+              key={item.id}
+              onClick={() => setActiveTab(item.id)}
+              className="flex flex-col items-center justify-center w-full h-full space-y-1 active:scale-95 transition-transform"
+            >
+              <div className={`p-1.5 rounded-full ${isActive ? 'bg-indigo-50' : 'bg-transparent'}`}>
+                <item.icon className={`w-5 h-5 ${isActive ? 'text-indigo-600' : 'text-slate-400'}`} />
+              </div>
+              <span className={`text-[10px] font-medium ${isActive ? 'text-indigo-600' : 'text-slate-500'}`}>
+                {item.label.split(' ')[0]} {/* Pega só a primeira palavra no mobile */}
+              </span>
+            </button>
+          );
+        })}
+      </nav>
     </div>
   );
 }
@@ -531,88 +556,86 @@ function DashboardView({ vendors, chartData, currentMonthData, selectedYear, set
 
   if (vendors.length === 0) {
     return (
-      <Card className="p-16 text-center flex flex-col items-center justify-center border-dashed border-slate-300 bg-slate-50">
+      <Card className="p-8 md:p-16 text-center flex flex-col items-center justify-center border-dashed border-slate-300 bg-slate-50">
         <Users className="w-12 h-12 text-slate-400 mb-4" />
-        <h3 className="text-xl font-medium text-slate-900 mb-2">Nenhum vendedor encontrado</h3>
-        <p className="text-slate-600 mb-6 max-w-md">Para começar a visualizar os gráficos de metas, você precisa cadastrar a sua equipe comercial.</p>
-        {hasEditPerm && <Badge variant="indigo">Vá até a aba Vendedores para cadastrar</Badge>}
+        <h3 className="text-xl font-medium text-slate-900 mb-2">Nenhum vendedor</h3>
+        <p className="text-slate-600 mb-6 max-w-md text-sm md:text-base">Cadastre a sua equipe comercial na aba Vendedores para começar.</p>
+        {hasEditPerm && <Badge variant="indigo">Cadastrar Vendedor</Badge>}
       </Card>
     );
   }
 
   return (
     <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <Card className="p-6 bg-white">
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 md:gap-6">
+        <Card className="p-5 md:p-6 bg-white">
           <div className="flex justify-between items-start">
             <div>
-              <p className="text-sm font-medium text-slate-500 mb-1">Meta Mês Atual ({MONTHS[new Date().getMonth()]})</p>
-              <h3 className="text-3xl font-bold tracking-tight text-slate-900">{formatCurrency(currentMonthData.metaMensal)}</h3>
+              <p className="text-[13px] md:text-sm font-medium text-slate-500 mb-1">Meta ({MONTHS[new Date().getMonth()]})</p>
+              <h3 className="text-2xl md:text-3xl font-bold tracking-tight text-slate-900">{formatCurrency(currentMonthData.metaMensal)}</h3>
             </div>
-            <div className="p-3 bg-indigo-50 rounded-xl border border-indigo-100"><Target className="w-5 h-5 text-indigo-600" /></div>
+            <div className="p-2 md:p-3 bg-indigo-50 rounded-xl border border-indigo-100"><Target className="w-5 h-5 text-indigo-600" /></div>
           </div>
         </Card>
         
-        <Card className="p-6 bg-white">
+        <Card className="p-5 md:p-6 bg-white">
           <div className="flex justify-between items-start">
             <div>
-              <p className="text-sm font-medium text-slate-500 mb-1">Total Realizado ({MONTHS[new Date().getMonth()]})</p>
-              <h3 className="text-3xl font-bold tracking-tight text-emerald-600">{formatCurrency(currentMonthData.realizado)}</h3>
-              <p className="text-xs text-slate-500 mt-1">Progresso atual no mês</p>
+              <p className="text-[13px] md:text-sm font-medium text-slate-500 mb-1">Feito ({MONTHS[new Date().getMonth()]})</p>
+              <h3 className="text-2xl md:text-3xl font-bold tracking-tight text-emerald-600">{formatCurrency(currentMonthData.realizado)}</h3>
             </div>
-            <div className="p-3 bg-emerald-50 rounded-xl border border-emerald-100"><CalendarDays className="w-5 h-5 text-emerald-600" /></div>
+            <div className="p-2 md:p-3 bg-emerald-50 rounded-xl border border-emerald-100"><CalendarDays className="w-5 h-5 text-emerald-600" /></div>
           </div>
         </Card>
 
-        <Card className="p-6 bg-slate-50 relative overflow-hidden">
+        <Card className="p-5 md:p-6 bg-slate-50 relative overflow-hidden">
           <div className="absolute top-0 right-0 p-16 bg-indigo-500/5 blur-3xl rounded-full"></div>
           <div className="flex justify-between items-start relative z-10">
             <div>
-              <p className="text-sm font-medium text-slate-500 mb-1">Acumulado Anual ({selectedYear})</p>
-              <h3 className="text-3xl font-bold tracking-tight text-slate-900">{formatCurrency(annualTotal)}</h3>
+              <p className="text-[13px] md:text-sm font-medium text-slate-500 mb-1">Acumulado ({selectedYear})</p>
+              <h3 className="text-2xl md:text-3xl font-bold tracking-tight text-slate-900">{formatCurrency(annualTotal)}</h3>
             </div>
-            <div className="p-3 bg-indigo-600 rounded-xl shadow-lg shadow-indigo-900/20"><TrendingUp className="w-5 h-5 text-white" /></div>
+            <div className="p-2 md:p-3 bg-indigo-600 rounded-xl shadow-lg shadow-indigo-900/20"><TrendingUp className="w-5 h-5 text-white" /></div>
           </div>
         </Card>
       </div>
 
-      <Card className="p-6">
-        <div className="flex justify-between items-center mb-8">
+      <Card className="p-4 md:p-6">
+        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 md:mb-8 gap-4">
           <div>
-            <h3 className="text-lg font-semibold text-slate-900">Projeção e Desempenho Anual</h3>
-            <p className="text-sm text-slate-500">Análise comparativa da distribuição de metas e realizado.</p>
+            <h3 className="text-base md:text-lg font-semibold text-slate-900">Projeção e Desempenho</h3>
           </div>
           <Select 
             value={selectedYear} 
             onChange={(e: any) => setSelectedYear(Number(e.target.value))}
             options={[2024, 2025, 2026, 2027].map(y => ({ value: y, label: y.toString() }))}
-            className="w-32"
+            className="w-full sm:w-32"
           />
         </div>
         
-        <div className="h-[250px] w-full">
+        <div className="h-[250px] md:h-[300px] w-full -ml-4 md:ml-0">
           <ResponsiveContainer width="100%" height="100%">
-            <ComposedChart data={chartData} margin={{ top: 10, right: 10, bottom: 0, left: 10 }}>
+            <ComposedChart data={chartData} margin={{ top: 10, right: 10, bottom: 0, left: 0 }}>
               <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#e2e8f0" />
-              <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{fill: '#64748b', fontSize: 12}} dy={10} />
+              <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{fill: '#64748b', fontSize: 11}} dy={10} />
               <YAxis 
                 yAxisId="left" 
                 axisLine={false} 
                 tickLine={false} 
-                tick={{fill: '#64748b', fontSize: 12}} 
+                tick={{fill: '#64748b', fontSize: 11}} 
                 tickFormatter={(value) => `R$ ${value / 1000}k`}
-                dx={-10}
+                dx={-5}
               />
               <RechartsTooltip 
                 cursor={{fill: '#f1f5f9'}}
-                contentStyle={{ backgroundColor: '#ffffff', borderRadius: '8px', border: '1px solid #e2e8f0', boxShadow: '0 10px 15px -3px rgb(0 0 0 / 0.1)' }}
+                contentStyle={{ backgroundColor: '#ffffff', borderRadius: '8px', border: '1px solid #e2e8f0', boxShadow: '0 10px 15px -3px rgb(0 0 0 / 0.1)', fontSize: '12px' }}
                 formatter={(value: number) => [formatCurrency(value), '']}
                 labelStyle={{ color: '#0f172a', fontWeight: 'bold', marginBottom: '8px' }}
                 itemStyle={{ color: '#475569' }}
               />
-              <Legend wrapperStyle={{ paddingTop: '10px' }} />
-              <Bar yAxisId="left" dataKey="metaMensal" name="Meta Mensal" fill="#4f46e5" radius={[4, 4, 0, 0]} maxBarSize={40} />
-              <Line yAxisId="left" type="monotone" dataKey="realizado" name="Realizado" stroke="#10b981" strokeWidth={3} dot={{r: 4, fill: '#ffffff', strokeWidth: 2, stroke: '#10b981'}} activeDot={{r: 6}} />
+              <Legend wrapperStyle={{ paddingTop: '10px', fontSize: '12px' }} />
+              <Bar yAxisId="left" dataKey="metaMensal" name="Meta" fill="#4f46e5" radius={[4, 4, 0, 0]} maxBarSize={30} />
+              <Line yAxisId="left" type="monotone" dataKey="realizado" name="Feito" stroke="#10b981" strokeWidth={3} dot={{r: 3, fill: '#ffffff', strokeWidth: 2, stroke: '#10b981'}} activeDot={{r: 5}} />
             </ComposedChart>
           </ResponsiveContainer>
         </div>
@@ -675,27 +698,27 @@ function VendorsManager({ vendors, currentUser, currentYear, showToast, hasEditP
   };
 
   return (
-    <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
-      <div className="flex justify-between items-center bg-white p-4 rounded-xl border border-slate-200 shadow-sm">
+    <div className="space-y-4 md:space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center bg-white p-4 rounded-xl border border-slate-200 shadow-sm gap-4">
         <div>
-          <h2 className="text-lg font-semibold text-slate-900">Equipe Comercial</h2>
-          <p className="text-sm text-slate-500">Gerencie seus vendedores, atribua metas e lance resultados.</p>
+          <h2 className="text-base md:text-lg font-semibold text-slate-900">Equipe Comercial</h2>
+          <p className="text-xs md:text-sm text-slate-500">Gerencie vendedores e lance resultados.</p>
         </div>
         {hasEditPerm && (
-          <Button onClick={() => setIsAdding(!isAdding)}>
+          <Button onClick={() => setIsAdding(!isAdding)} className="w-full sm:w-auto">
             {isAdding ? 'Cancelar' : <><Plus className="w-4 h-4 mr-2" /> Novo Vendedor</>}
           </Button>
         )}
       </div>
 
       {isAdding && hasEditPerm && (
-        <Card className="p-6 bg-slate-50 border-indigo-500/30 border-2 border-dashed">
-          <form onSubmit={handleAddVendor} className="flex gap-4 items-end">
-            <div className="flex-1">
-              <label className="block text-sm font-medium text-slate-700 mb-2">Nome Completo do Vendedor</label>
+        <Card className="p-4 md:p-6 bg-slate-50 border-indigo-500/30 border-2 border-dashed">
+          <form onSubmit={handleAddVendor} className="flex flex-col sm:flex-row gap-4 items-end">
+            <div className="flex-1 w-full">
+              <label className="block text-sm font-medium text-slate-700 mb-2">Nome Completo</label>
               <Input autoFocus value={newVendorName} onChange={(e:any) => setNewVendorName(e.target.value)} placeholder="Ex: Carlos Eduardo" required />
             </div>
-            <Button type="submit">Salvar Vendedor</Button>
+            <Button type="submit" className="w-full sm:w-auto">Salvar</Button>
           </form>
         </Card>
       )}
@@ -704,71 +727,73 @@ function VendorsManager({ vendors, currentUser, currentYear, showToast, hasEditP
         {vendors.map(vendor => (
           <Card key={vendor.id} className="overflow-visible transition-all hover:border-slate-300">
             <div 
-              className="p-5 flex justify-between items-center cursor-pointer hover:bg-slate-50 transition-colors"
+              className="p-4 md:p-5 flex flex-col sm:flex-row justify-between items-start sm:items-center cursor-pointer hover:bg-slate-50 transition-colors gap-4 sm:gap-0"
               onClick={() => { setEditingVendor(editingVendor === vendor.id ? null : vendor.id); setEditorTab('goals'); }}
             >
-              <div className="flex items-center">
-                <div className="w-12 h-12 rounded-xl bg-slate-100 text-indigo-600 flex items-center justify-center font-bold text-lg border border-slate-200 mr-4 shadow-inner">
+              <div className="flex items-center w-full sm:w-auto">
+                <div className="w-10 h-10 md:w-12 md:h-12 rounded-xl bg-slate-100 text-indigo-600 flex items-center justify-center font-bold text-base md:text-lg border border-slate-200 mr-3 md:mr-4 shadow-inner shrink-0">
                   {vendor.name.charAt(0)}
                 </div>
-                <div>
-                  <h3 className="font-semibold text-slate-900 text-lg">{vendor.name}</h3>
-                  <p className="text-sm text-slate-500">Id: {vendor.id.split('-')[0]} • Cadastrado em {new Date(vendor.createdAt).toLocaleDateString()}</p>
+                <div className="truncate">
+                  <h3 className="font-semibold text-slate-900 text-sm md:text-lg truncate">{vendor.name}</h3>
+                  <p className="text-[11px] md:text-sm text-slate-500">Cadastrado em {new Date(vendor.createdAt).toLocaleDateString()}</p>
                 </div>
               </div>
-              <div className="flex items-center gap-2">
+              <div className="flex items-center justify-between sm:justify-end w-full sm:w-auto gap-2 border-t sm:border-0 border-slate-100 pt-3 sm:pt-0">
                 <Badge variant={vendor.goals && Object.keys(vendor.goals).length > 0 ? 'success' : 'default'}>
                   {vendor.goals && Object.keys(vendor.goals).length > 0 ? 'Metas Ativas' : 'Sem Metas'}
                 </Badge>
-                {hasEditPerm && (
-                  <Button variant="ghost" size="icon" className="text-slate-400 hover:text-red-500" onClick={(e:any) => { e.stopPropagation(); handleDelete(vendor.id); }}>
-                    <Trash2 className="w-4 h-4" />
-                  </Button>
-                )}
-                <ChevronDown className={`w-5 h-5 text-slate-400 transition-transform ${editingVendor === vendor.id ? 'rotate-180' : ''}`} />
+                <div className="flex items-center gap-2">
+                  {hasEditPerm && (
+                    <Button variant="ghost" size="sm" className="text-slate-400 hover:text-red-500 px-2" onClick={(e:any) => { e.stopPropagation(); handleDelete(vendor.id); }}>
+                      <Trash2 className="w-4 h-4" />
+                    </Button>
+                  )}
+                  <ChevronDown className={`w-5 h-5 text-slate-400 transition-transform ${editingVendor === vendor.id ? 'rotate-180' : ''}`} />
+                </div>
               </div>
             </div>
 
             {editingVendor === vendor.id && (
-              <div className="border-t border-slate-200 p-6 bg-slate-50">
-                <div className="flex gap-6 mb-6 border-b border-slate-200">
+              <div className="border-t border-slate-200 p-4 md:p-6 bg-slate-50">
+                <div className="flex gap-4 md:gap-6 mb-6 border-b border-slate-200 overflow-x-auto whitespace-nowrap hide-scrollbar">
                   <button 
-                    className={`pb-3 text-sm font-medium transition-colors ${editorTab === 'goals' ? 'border-b-2 border-indigo-500 text-indigo-600' : 'text-slate-500 hover:text-slate-700'}`}
+                    className={`pb-3 text-sm font-medium transition-colors border-b-2 ${editorTab === 'goals' ? 'border-indigo-500 text-indigo-600' : 'border-transparent text-slate-500 hover:text-slate-700'}`}
                     onClick={() => setEditorTab('goals')}
                   >
                     Metas Anuais (R$)
                   </button>
                   <button 
-                    className={`pb-3 text-sm font-medium transition-colors ${editorTab === 'actuals' ? 'border-b-2 border-emerald-500 text-emerald-600' : 'text-slate-500 hover:text-slate-700'}`}
+                    className={`pb-3 text-sm font-medium transition-colors border-b-2 ${editorTab === 'actuals' ? 'border-emerald-500 text-emerald-600' : 'border-transparent text-slate-500 hover:text-slate-700'}`}
                     onClick={() => setEditorTab('actuals')}
                   >
-                    Resultados Semanais (Feito)
+                    Resultados Semanais
                   </button>
                 </div>
 
-                <div className="mb-4 flex justify-between items-center">
+                <div className="mb-4 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
                   <div>
-                    <h4 className="font-medium text-slate-900">
+                    <h4 className="text-sm md:text-base font-medium text-slate-900">
                       {editorTab === 'goals' ? `Grade de Metas (${currentYear})` : `Lançamento de Resultados (${currentYear})`}
                     </h4>
-                    <p className="text-xs text-slate-500 mt-1">Os valores são salvos automaticamente.</p>
+                    <p className="text-[11px] md:text-xs text-slate-500 mt-0.5">Salvo automaticamente.</p>
                   </div>
                   {editorTab === 'actuals' && (
-                    <Select value={actualsMonth} onChange={(e:any) => setActualsMonth(Number(e.target.value))} options={MONTHS_FULL.map((m,i)=>({label: m, value: i+1}))} className="w-40 h-8 text-xs" />
+                    <Select value={actualsMonth} onChange={(e:any) => setActualsMonth(Number(e.target.value))} options={MONTHS_FULL.map((m,i)=>({label: m, value: i+1}))} className="w-full sm:w-40 h-9 text-xs" />
                   )}
                 </div>
 
                 {editorTab === 'goals' && (
-                  <div className="grid grid-cols-2 md:grid-cols-4 xl:grid-cols-6 gap-4">
+                  <div className="grid grid-cols-2 md:grid-cols-4 xl:grid-cols-6 gap-3 md:gap-4">
                     {MONTHS.map((month, idx) => {
                       const monthKey = `${currentYear}-${String(idx + 1).padStart(2, '0')}`;
                       const currentVal = vendor.goals?.[monthKey] || '';
                       return (
-                        <div key={month} className="space-y-1.5">
-                          <label className="text-xs font-semibold text-slate-600 ml-1 uppercase tracking-wider">{month}</label>
+                        <div key={month} className="space-y-1">
+                          <label className="text-[10px] md:text-xs font-semibold text-slate-600 ml-1 uppercase tracking-wider">{month}</label>
                           <div className="relative">
-                            <span className="absolute left-3 top-2.5 text-slate-400 text-sm font-medium">R$</span>
-                            <Input type="text" className="pl-9 font-mono text-sm" placeholder="0.00" defaultValue={currentVal} disabled={!hasEditPerm}
+                            <span className="absolute left-2.5 top-2.5 text-slate-400 text-xs md:text-sm font-medium">R$</span>
+                            <Input type="text" inputMode="decimal" className="pl-8 text-xs md:text-sm font-mono h-9 md:h-10" placeholder="0.00" defaultValue={currentVal} disabled={!hasEditPerm}
                               onBlur={(e:any) => { if(e.target.value !== String(currentVal)) handleUpdateGoal(vendor.id, monthKey, e.target.value); }}
                             />
                           </div>
@@ -779,16 +804,16 @@ function VendorsManager({ vendors, currentUser, currentYear, showToast, hasEditP
                 )}
 
                 {editorTab === 'actuals' && (
-                  <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-5 gap-4">
+                  <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-3 md:gap-4">
                     {Array.from({length: getWeeksInMonth(currentYear, actualsMonth)}).map((_, i) => {
                        const monthKey = `${currentYear}-${String(actualsMonth).padStart(2, '0')}`;
                        const currentVal = vendor.actuals?.[monthKey]?.[i] || '';
                        return (
-                          <div key={i} className="space-y-1.5">
-                            <label className="text-xs font-semibold text-emerald-600 ml-1 uppercase tracking-wider">Semana {i+1}</label>
+                          <div key={i} className="space-y-1">
+                            <label className="text-[10px] md:text-xs font-semibold text-emerald-600 ml-1 uppercase tracking-wider">Semana {i+1}</label>
                             <div className="relative">
-                              <span className="absolute left-3 top-2.5 text-slate-400 text-sm font-medium">R$</span>
-                              <Input type="text" className="pl-9 font-mono text-sm border-emerald-200 focus:ring-emerald-500" placeholder="0.00" defaultValue={currentVal} disabled={!hasEditPerm}
+                              <span className="absolute left-2.5 top-2.5 text-slate-400 text-xs md:text-sm font-medium">R$</span>
+                              <Input type="text" inputMode="decimal" className="pl-8 text-xs md:text-sm font-mono h-9 md:h-10 border-emerald-200 focus:ring-emerald-500" placeholder="0.00" defaultValue={currentVal} disabled={!hasEditPerm}
                                 onBlur={(e:any) => { if(e.target.value !== String(currentVal)) handleUpdateActual(vendor.id, monthKey, i, e.target.value); }}
                               />
                             </div>
@@ -802,7 +827,7 @@ function VendorsManager({ vendors, currentUser, currentYear, showToast, hasEditP
           </Card>
         ))}
         {vendors.length === 0 && !isAdding && (
-          <div className="text-center py-16 text-slate-500 border border-dashed border-slate-300 rounded-xl">Nenhum vendedor cadastrado.</div>
+          <div className="text-center py-10 md:py-16 text-slate-500 text-sm border border-dashed border-slate-300 rounded-xl">Nenhum vendedor cadastrado.</div>
         )}
       </div>
     </div>
@@ -815,10 +840,10 @@ function ReportsView({ vendor, year, companySettings }: any) {
 
   if (!vendor) {
     return (
-      <Card className="p-16 text-center border-dashed border-slate-300 bg-slate-50">
+      <Card className="p-8 md:p-16 text-center border-dashed border-slate-300 bg-slate-50">
         <Printer className="w-12 h-12 text-slate-400 mb-4 mx-auto" />
-        <h3 className="text-xl font-medium text-slate-900 mb-2">Selecione um vendedor</h3>
-        <p className="text-slate-600">Utilize o seletor no cabeçalho para gerar o relatório oficial de impressão.</p>
+        <h3 className="text-lg md:text-xl font-medium text-slate-900 mb-2">Selecione um vendedor</h3>
+        <p className="text-sm md:text-base text-slate-600">Utilize o seletor no cabeçalho para visualizar o relatório.</p>
       </Card>
     );
   }
@@ -841,54 +866,74 @@ function ReportsView({ vendor, year, companySettings }: any) {
   const falta = Math.max(0, monthlyGoal - totalRealizado);
 
   return (
-    <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500 relative min-h-[600px]">
-      <div className="flex flex-col sm:flex-row justify-between items-center bg-white p-4 rounded-xl border border-slate-200 print-hide gap-4">
+    <div className="space-y-4 md:space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500 relative min-h-[500px]">
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center bg-white p-4 rounded-xl border border-slate-200 print-hide gap-4">
         <div>
-          <h2 className="text-lg font-semibold text-slate-900">Relatório Mensal do Vendedor</h2>
-          <p className="text-sm text-slate-500">Layout de impressão focado no detalhamento semanal.</p>
+          <h2 className="text-base md:text-lg font-semibold text-slate-900">Relatório Mensal</h2>
+          <p className="text-xs md:text-sm text-slate-500">Detalhamento semanal do vendedor.</p>
         </div>
-        <div className="flex gap-3">
-          <Select value={reportMonth} onChange={(e:any)=>setReportMonth(Number(e.target.value))} options={MONTHS_FULL.map((m,i)=>({label: m, value: i+1}))} className="w-40" />
-          <Button onClick={handlePrint}><Printer className="w-4 h-4 mr-2"/> Imprimir / PDF</Button>
+        <div className="flex w-full sm:w-auto gap-3">
+          <Select value={reportMonth} onChange={(e:any)=>setReportMonth(Number(e.target.value))} options={MONTHS_FULL.map((m,i)=>({label: m, value: i+1}))} className="w-full sm:w-40" />
+          <Button onClick={handlePrint} className="shrink-0"><Printer className="w-4 h-4 md:mr-2"/> <span className="hidden md:inline">Imprimir / PDF</span></Button>
         </div>
       </div>
 
-      <Card className="p-10 bg-white text-slate-900 print:border-none print:shadow-none print:p-0 print:bg-transparent pb-24 print:pb-0">
+      <Card className="p-4 md:p-10 bg-white text-slate-900 print:border-none print:shadow-none print:p-0 print:bg-transparent pb-6 print:pb-0">
         {/* PRINT HEADER */}
-        <div className="border-b-2 border-slate-200 pb-8 mb-8 flex justify-between items-end">
+        <div className="border-b border-slate-200 pb-6 mb-6 flex flex-col md:flex-row md:justify-between md:items-end gap-4">
           <div>
             <div className="flex items-center gap-2 mb-2">
-              <Building className="w-8 h-8 text-indigo-600" />
-              <span className="text-4xl font-black text-slate-900 tracking-tight">{companySettings.name}</span>
+              <Building className="w-6 h-6 md:w-8 md:h-8 text-indigo-600" />
+              <span className="text-2xl md:text-4xl font-black text-slate-900 tracking-tight">{companySettings.name}</span>
             </div>
-            <h1 className="text-xl font-bold text-slate-500 tracking-tight uppercase">Relatório de Metas</h1>
-            <p className="text-slate-500 mt-1 font-medium">Mês Base: {MONTHS_FULL[reportMonth - 1]} {year}</p>
+            <h1 className="text-base md:text-xl font-bold text-slate-500 tracking-tight uppercase">Relatório de Metas</h1>
+            <p className="text-sm text-slate-500 mt-1 font-medium">Mês Base: {MONTHS_FULL[reportMonth - 1]} {year}</p>
           </div>
-          <div className="text-right bg-slate-50 p-4 rounded-xl border border-slate-100">
-            <p className="text-xs text-slate-400 font-bold uppercase tracking-wider mb-1">Vendedor Associado</p>
-            <h2 className="text-xl font-bold text-indigo-600">{vendor.name}</h2>
+          <div className="text-left md:text-right bg-slate-50 p-3 md:p-4 rounded-xl border border-slate-100">
+            <p className="text-[10px] md:text-xs text-slate-400 font-bold uppercase tracking-wider mb-1">Vendedor Associado</p>
+            <h2 className="text-lg md:text-xl font-bold text-indigo-600">{vendor.name}</h2>
           </div>
         </div>
 
-        {/* PRINT TABLE (WEEKS) */}
-        <div className="overflow-x-auto rounded-lg border border-slate-200 mb-8">
-          <table className="w-full text-sm text-left">
-            <thead className="bg-slate-50 text-slate-700 font-bold uppercase tracking-wider text-xs border-b border-slate-200">
+        {/* SUMMARY CARDS - Moved above table for better mobile flow */}
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-4 mb-6">
+            <div className="bg-slate-50 p-3 rounded-lg border border-slate-200 text-center">
+              <p className="text-[10px] md:text-xs text-slate-500 font-bold uppercase mb-1">Meta Mês</p>
+              <p className="text-sm md:text-lg font-mono font-bold text-slate-900">{formatCurrency(monthlyGoal)}</p>
+            </div>
+            <div className="bg-emerald-50 p-3 rounded-lg border border-emerald-200 text-center">
+              <p className="text-[10px] md:text-xs text-emerald-600 font-bold uppercase mb-1">Realizado</p>
+              <p className="text-sm md:text-lg font-mono font-bold text-emerald-700">{formatCurrency(totalRealizado)}</p>
+            </div>
+            <div className="bg-amber-50 p-3 rounded-lg border border-amber-200 text-center">
+              <p className="text-[10px] md:text-xs text-amber-600 font-bold uppercase mb-1">Falta</p>
+              <p className="text-sm md:text-lg font-mono font-bold text-amber-700">{formatCurrency(falta)}</p>
+            </div>
+            <div className="bg-indigo-50 p-3 rounded-lg border border-indigo-200 text-center">
+              <p className="text-[10px] md:text-xs text-indigo-600 font-bold uppercase mb-1">% do Mês</p>
+              <p className="text-base md:text-xl font-black text-indigo-700">{percentTotal.toFixed(1)}%</p>
+            </div>
+        </div>
+
+        {/* TABLE (WEEKS) */}
+        <div className="overflow-x-auto rounded-lg border border-slate-200">
+          <table className="w-full text-xs md:text-sm text-left">
+            <thead className="bg-slate-50 text-slate-700 font-bold uppercase tracking-wider border-b border-slate-200">
               <tr>
-                <th className="px-6 py-4">Período</th>
-                <th className="px-6 py-4 text-right">Meta (Esperado)</th>
-                <th className="px-6 py-4 text-right">Feito (Realizado)</th>
-                <th className="px-6 py-4 text-right">Atingimento Semanal</th>
+                <th className="px-4 py-3">Período</th>
+                <th className="px-4 py-3 text-right">Meta</th>
+                <th className="px-4 py-3 text-right">Feito</th>
+                <th className="px-4 py-3 text-right">%</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-100">
               {tableRows.map((row: any) => (
                 <tr key={row.week} className="hover:bg-slate-50 transition-colors">
-                  <td className="px-6 py-4 font-bold text-slate-900">Semana {row.week}</td>
-                  <td className="px-6 py-4 text-right font-mono text-slate-500">{formatCurrency(weeklyGoal)}</td>
-                  <td className="px-6 py-4 text-right font-mono font-bold text-slate-900">{formatCurrency(row.actual)}</td>
-                  <td className="px-6 py-4 text-right">
-                    <span className={`inline-flex px-2.5 py-1 rounded-md text-xs font-bold ${row.percentage >= 100 ? 'bg-emerald-100 text-emerald-700' : row.percentage >= 80 ? 'bg-amber-100 text-amber-700' : 'bg-red-100 text-red-700'}`}>
+                  <td className="px-4 py-3 font-bold text-slate-900 whitespace-nowrap">Semana {row.week}</td>
+                  <td className="px-4 py-3 text-right font-mono text-slate-500 whitespace-nowrap">{formatCurrency(weeklyGoal)}</td>
+                  <td className="px-4 py-3 text-right font-mono font-bold text-slate-900 whitespace-nowrap">{formatCurrency(row.actual)}</td>
+                  <td className="px-4 py-3 text-right">
+                    <span className={`inline-flex px-2 py-1 rounded-md text-[10px] md:text-xs font-bold ${row.percentage >= 100 ? 'bg-emerald-100 text-emerald-700' : row.percentage >= 80 ? 'bg-amber-100 text-amber-700' : 'bg-red-100 text-red-700'}`}>
                       {row.percentage.toFixed(1)}%
                     </span>
                   </td>
@@ -898,29 +943,10 @@ function ReportsView({ vendor, year, companySettings }: any) {
           </table>
         </div>
 
-        {/* SUMMARY CARDS / FOOTER */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-            <div className="bg-slate-50 p-4 rounded-lg border border-slate-200 text-center">
-              <p className="text-xs text-slate-500 font-bold uppercase mb-1">Meta do Mês</p>
-              <p className="text-lg font-mono font-bold text-slate-900">{formatCurrency(monthlyGoal)}</p>
-            </div>
-            <div className="bg-emerald-50 p-4 rounded-lg border border-emerald-200 text-center">
-              <p className="text-xs text-emerald-600 font-bold uppercase mb-1">Total Realizado</p>
-              <p className="text-lg font-mono font-bold text-emerald-700">{formatCurrency(totalRealizado)}</p>
-            </div>
-            <div className="bg-amber-50 p-4 rounded-lg border border-amber-200 text-center">
-              <p className="text-xs text-amber-600 font-bold uppercase mb-1">Falta p/ Meta</p>
-              <p className="text-lg font-mono font-bold text-amber-700">{formatCurrency(falta)}</p>
-            </div>
-            <div className="bg-indigo-50 p-4 rounded-lg border border-indigo-200 text-center">
-              <p className="text-xs text-indigo-600 font-bold uppercase mb-1">% do Mês</p>
-              <p className="text-xl font-black text-indigo-700">{percentTotal.toFixed(1)}%</p>
-            </div>
-        </div>
       </Card>
       
-      {/* PRINT FOOTER NEXIO - Fixed at Bottom during print */}
-      <div className="fixed bottom-4 left-0 w-full text-[10px] text-center text-slate-400 print-only uppercase tracking-widest font-semibold">
+      {/* PRINT FOOTER NEXIO */}
+      <div className="hidden print:block fixed bottom-4 left-0 w-full text-[10px] text-center text-slate-400 uppercase tracking-widest font-semibold">
         DEVELOPED BY NEXIO
       </div>
     </div>
@@ -952,7 +978,7 @@ function SettingsManager({ companySettings, setCompanySettings, showToast, curre
     }
     await updateDoc(doc(db, 'artifacts', appId, 'public', 'data', 'app_users', userId), { [field]: value });
     setUsers(users.map(u => u.id === userId ? { ...u, [field]: value } : u));
-    showToast("Usuário atualizado com sucesso.");
+    showToast("Usuário atualizado.");
   };
 
   const handleUpdatePermission = async (userId: string, tab: string, level: string) => {
@@ -964,73 +990,73 @@ function SettingsManager({ companySettings, setCompanySettings, showToast, curre
   };
 
   return (
-    <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
-      <Card className="p-6">
-        <div className="flex items-center gap-3 mb-6">
+    <div className="space-y-4 md:space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
+      <Card className="p-4 md:p-6">
+        <div className="flex items-center gap-3 mb-4 md:mb-6">
           <div className="p-2 bg-indigo-50 rounded-lg"><Building className="w-5 h-5 text-indigo-600"/></div>
           <div>
-            <h3 className="text-lg font-semibold text-slate-900">Configurações da Empresa</h3>
-            <p className="text-sm text-slate-500">Define os dados globais que aparecerão nos relatórios.</p>
+            <h3 className="text-base md:text-lg font-semibold text-slate-900">Configuração da Empresa</h3>
+            <p className="text-xs md:text-sm text-slate-500">Dados globais para os relatórios.</p>
           </div>
         </div>
-        <div className="flex gap-4 max-w-xl">
-          <div className="flex-1">
-            <label className="block text-xs font-medium text-slate-500 mb-1.5 uppercase">Nome da Empresa (Razão Social ou Fantasia)</label>
+        <div className="flex flex-col sm:flex-row gap-3 md:gap-4 max-w-xl">
+          <div className="flex-1 w-full">
+            <label className="block text-[10px] md:text-xs font-medium text-slate-500 mb-1.5 uppercase">Nome da Empresa</label>
             <Input value={companyNameInput} onChange={(e:any) => setCompanyNameInput(e.target.value)} />
           </div>
-          <div className="flex items-end">
-            <Button onClick={handleUpdateCompany}>Salvar Alterações</Button>
+          <div className="flex items-end w-full sm:w-auto">
+            <Button onClick={handleUpdateCompany} className="w-full">Salvar</Button>
           </div>
         </div>
       </Card>
 
-      <Card className="p-6">
-        <div className="flex items-center gap-3 mb-6">
+      <Card className="p-4 md:p-6">
+        <div className="flex items-center gap-3 mb-4 md:mb-6">
           <div className="p-2 bg-emerald-50 rounded-lg"><Shield className="w-5 h-5 text-emerald-600"/></div>
           <div>
-            <h3 className="text-lg font-semibold text-slate-900">Controle de Acesso (ACL) e Usuários</h3>
-            <p className="text-sm text-slate-500">Gerencie níveis de acesso, códigos e papéis de todos os usuários do sistema.</p>
+            <h3 className="text-base md:text-lg font-semibold text-slate-900">Acesso e Usuários</h3>
+            <p className="text-xs md:text-sm text-slate-500">Gerencie níveis de acesso e códigos.</p>
           </div>
         </div>
 
-        <div className="space-y-6">
+        <div className="space-y-4 md:space-y-6">
           {users.map(u => (
-            <div key={u.id} className="bg-slate-50 p-6 rounded-xl border border-slate-200 relative">
+            <div key={u.id} className="bg-slate-50 p-4 md:p-6 rounded-xl border border-slate-200 relative">
               {u.role === 'MASTER' && (
-                <div className="absolute top-4 right-4"><Badge variant="indigo"><Shield className="w-3 h-3 mr-1"/> Master Access</Badge></div>
+                <div className="absolute top-3 right-3 md:top-4 md:right-4"><Badge variant="indigo" className="text-[9px]"><Shield className="w-3 h-3 mr-1"/> Master</Badge></div>
               )}
               
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6 pr-24">
+              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3 md:gap-4 mb-4 md:mb-6 pr-0 md:pr-24 mt-6 md:mt-0">
                 <div>
-                  <label className="block text-xs font-medium text-slate-500 mb-1.5 uppercase">Nome do Usuário</label>
+                  <label className="block text-[10px] md:text-xs font-medium text-slate-500 mb-1.5 uppercase">Nome</label>
                   <Input defaultValue={u.name} onBlur={(e:any) => { if(e.target.value !== u.name) handleUpdateUser(u.id, 'name', e.target.value) }} />
                 </div>
                 <div>
-                  <label className="block text-xs font-medium text-slate-500 mb-1.5 uppercase">Redefinir Senha</label>
-                  <Input type="password" placeholder="••••••••" onBlur={(e:any) => { if(e.target.value.trim() !== '') { handleUpdateUser(u.id, 'code', e.target.value); e.target.value = ''; } }} />
+                  <label className="block text-[10px] md:text-xs font-medium text-slate-500 mb-1.5 uppercase">Senha</label>
+                  <Input type="password" inputMode="numeric" placeholder="••••" onBlur={(e:any) => { if(e.target.value.trim() !== '') { handleUpdateUser(u.id, 'code', e.target.value); e.target.value = ''; } }} />
                 </div>
                 <div>
-                  <label className="block text-xs font-medium text-slate-500 mb-1.5 uppercase">Papel Global</label>
+                  <label className="block text-[10px] md:text-xs font-medium text-slate-500 mb-1.5 uppercase">Papel</label>
                   <Select 
                     value={u.role} 
                     onChange={(e:any) => handleUpdateUser(u.id, 'role', e.target.value)}
-                    options={[{value: 'USER', label: 'Usuário Padrão'}, {value: 'MASTER', label: 'Administrador (MASTER)'}]}
+                    options={[{value: 'USER', label: 'Usuário'}, {value: 'MASTER', label: 'Admin (MASTER)'}]}
                   />
                 </div>
               </div>
 
               {u.role !== 'MASTER' && (
-                <div className="border-t border-slate-200 pt-4">
-                  <h4 className="text-xs font-semibold text-slate-600 uppercase mb-3">Permissões de Módulos</h4>
-                  <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                <div className="border-t border-slate-200 pt-3 md:pt-4">
+                  <h4 className="text-[10px] md:text-xs font-semibold text-slate-600 uppercase mb-2 md:mb-3">Permissões</h4>
+                  <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 md:gap-4">
                     {['dashboard', 'vendors', 'reports'].map(tab => (
                       <div key={tab}>
-                        <label className="block text-xs text-slate-600 mb-1 capitalize">{tab}</label>
+                        <label className="block text-[10px] md:text-xs text-slate-600 mb-1 capitalize">{tab === 'vendors' ? 'Equipe' : tab === 'reports' ? 'Relatórios' : tab}</label>
                         <Select 
-                          className="h-8 text-xs"
+                          className="h-8 text-[11px] md:text-xs"
                           value={u.permissions?.[tab] || 'none'}
                           onChange={(e:any) => handleUpdatePermission(u.id, tab, e.target.value)}
-                          options={[{value: 'none', label: 'Sem Acesso'}, {value: 'view', label: 'Apenas Leitura'}, {value: 'edit', label: 'Acesso Total'}]}
+                          options={[{value: 'none', label: 'Bloqueado'}, {value: 'view', label: 'Leitura'}, {value: 'edit', label: 'Total'}]}
                         />
                       </div>
                     ))}
