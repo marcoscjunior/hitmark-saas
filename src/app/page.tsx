@@ -420,7 +420,7 @@ function MainApp({ currentUser, onLogout, companySettings, setCompanySettings, s
           <div className="bg-slate-50 rounded-xl p-3 border border-slate-200 mb-3">
             <div className="flex items-center">
               <div className="w-8 h-8 rounded-full bg-indigo-600 text-white flex items-center justify-center font-bold text-xs uppercase shadow-inner">
-                {currentUser.name.substring(0,2)}
+                {currentUser.name ? currentUser.name.substring(0, 2).toUpperCase() : 'US'}
               </div>
               <div className="ml-3 overflow-hidden">
                 <p className="text-sm font-semibold text-slate-900 truncate">{currentUser.name}</p>
@@ -451,7 +451,7 @@ function MainApp({ currentUser, onLogout, companySettings, setCompanySettings, s
               {activeTab === 'dashboard' && 'Dashboard'}
               {activeTab === 'vendors' && 'Equipe'}
               {activeTab === 'reports' && 'Relatórios'}
-              {activeTab === 'settings' && 'Painel Master'}
+              {activeTab === 'settings' && 'Ajustes Globais'}
             </h1>
             <button onClick={onLogout} className="md:hidden p-2 bg-slate-100 text-slate-500 hover:bg-slate-200 rounded-lg transition-colors">
               <LogOut className="w-4 h-4" />
@@ -471,7 +471,6 @@ function MainApp({ currentUser, onLogout, companySettings, setCompanySettings, s
         </header>
 
         {/* CONTENT AREA */}
-        {/* pb-24 adicionado no mobile para não esconder conteúdo atrás da barra de navegação inferior */}
         <div className="flex-1 overflow-auto p-4 pb-24 md:p-8 md:pb-8 relative z-0 print:p-0 print:overflow-visible">
           <div className="max-w-6xl mx-auto space-y-6 md:space-y-8">
             {!canAccess(activeTab) ? (
@@ -539,7 +538,7 @@ function MainApp({ currentUser, onLogout, companySettings, setCompanySettings, s
                 <item.icon className={`w-5 h-5 ${isActive ? 'text-indigo-600' : 'text-slate-400'}`} />
               </div>
               <span className={`text-[10px] font-medium ${isActive ? 'text-indigo-600' : 'text-slate-500'}`}>
-                {item.label.split(' ')[0]} {/* Pega só a primeira palavra no mobile */}
+                {item.label.split(' ')[0]}
               </span>
             </button>
           );
@@ -895,7 +894,7 @@ function ReportsView({ vendor, year, companySettings }: any) {
           </div>
         </div>
 
-        {/* SUMMARY CARDS - Moved above table for better mobile flow */}
+        {/* SUMMARY CARDS */}
         <div className="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-4 mb-6">
             <div className="bg-slate-50 p-3 rounded-lg border border-slate-200 text-center">
               <p className="text-[10px] md:text-xs text-slate-500 font-bold uppercase mb-1">Meta Mês</p>
@@ -955,7 +954,7 @@ function ReportsView({ vendor, year, companySettings }: any) {
 
 function SettingsManager({ companySettings, setCompanySettings, showToast, currentUser }: any) {
   const [users, setUsers] = useState<any[]>([]);
-  const [companyNameInput, setCompanyNameInput] = useState(companySettings.name);
+  const [companyNameInput, setCompanyNameInput] = useState(companySettings.name || '');
 
   useEffect(() => {
     const fetchUsers = async () => {
@@ -966,7 +965,7 @@ function SettingsManager({ companySettings, setCompanySettings, showToast, curre
   }, []);
 
   const handleUpdateCompany = async () => {
-    if (!companyNameInput) return;
+    if (!companyNameInput.trim()) return;
     await setDoc(doc(db, 'artifacts', appId, 'public', 'data', 'settings', 'company'), { name: companyNameInput });
     setCompanySettings({ name: companyNameInput });
     showToast("Nome da empresa atualizado.");
@@ -990,83 +989,115 @@ function SettingsManager({ companySettings, setCompanySettings, showToast, curre
   };
 
   return (
-    <div className="space-y-4 md:space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
-      <Card className="p-4 md:p-6">
-        <div className="flex items-center gap-3 mb-4 md:mb-6">
-          <div className="p-2 bg-indigo-50 rounded-lg"><Building className="w-5 h-5 text-indigo-600"/></div>
-          <div>
-            <h3 className="text-base md:text-lg font-semibold text-slate-900">Configuração da Empresa</h3>
-            <p className="text-xs md:text-sm text-slate-500">Dados globais para os relatórios.</p>
-          </div>
+    <div className="space-y-10 md:space-y-12 animate-in fade-in slide-in-from-bottom-4 duration-500 pb-10">
+      
+      {/* --- SEÇÃO: DADOS DA EMPRESA --- */}
+      <div className="flex flex-col md:flex-row gap-4 md:gap-8">
+        <div className="w-full md:w-1/3">
+          <h3 className="text-lg font-bold text-slate-900">Perfil da Empresa</h3>
+          <p className="text-sm text-slate-500 mt-1">Configure o nome fantasia que será impresso nos cabeçalhos dos relatórios e dashboards.</p>
         </div>
-        <div className="flex flex-col sm:flex-row gap-3 md:gap-4 max-w-xl">
-          <div className="flex-1 w-full">
-            <label className="block text-[10px] md:text-xs font-medium text-slate-500 mb-1.5 uppercase">Nome da Empresa</label>
-            <Input value={companyNameInput} onChange={(e:any) => setCompanyNameInput(e.target.value)} />
-          </div>
-          <div className="flex items-end w-full sm:w-auto">
-            <Button onClick={handleUpdateCompany} className="w-full">Salvar</Button>
-          </div>
-        </div>
-      </Card>
-
-      <Card className="p-4 md:p-6">
-        <div className="flex items-center gap-3 mb-4 md:mb-6">
-          <div className="p-2 bg-emerald-50 rounded-lg"><Shield className="w-5 h-5 text-emerald-600"/></div>
-          <div>
-            <h3 className="text-base md:text-lg font-semibold text-slate-900">Acesso e Usuários</h3>
-            <p className="text-xs md:text-sm text-slate-500">Gerencie níveis de acesso e códigos.</p>
-          </div>
-        </div>
-
-        <div className="space-y-4 md:space-y-6">
-          {users.map(u => (
-            <div key={u.id} className="bg-slate-50 p-4 md:p-6 rounded-xl border border-slate-200 relative">
-              {u.role === 'MASTER' && (
-                <div className="absolute top-3 right-3 md:top-4 md:right-4"><Badge variant="indigo" className="text-[9px]"><Shield className="w-3 h-3 mr-1"/> Master</Badge></div>
-              )}
-              
-              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3 md:gap-4 mb-4 md:mb-6 pr-0 md:pr-24 mt-6 md:mt-0">
-                <div>
-                  <label className="block text-[10px] md:text-xs font-medium text-slate-500 mb-1.5 uppercase">Nome</label>
-                  <Input defaultValue={u.name} onBlur={(e:any) => { if(e.target.value !== u.name) handleUpdateUser(u.id, 'name', e.target.value) }} />
-                </div>
-                <div>
-                  <label className="block text-[10px] md:text-xs font-medium text-slate-500 mb-1.5 uppercase">Senha</label>
-                  <Input type="password" inputMode="numeric" placeholder="••••" onBlur={(e:any) => { if(e.target.value.trim() !== '') { handleUpdateUser(u.id, 'code', e.target.value); e.target.value = ''; } }} />
-                </div>
-                <div>
-                  <label className="block text-[10px] md:text-xs font-medium text-slate-500 mb-1.5 uppercase">Papel</label>
-                  <Select 
-                    value={u.role} 
-                    onChange={(e:any) => handleUpdateUser(u.id, 'role', e.target.value)}
-                    options={[{value: 'USER', label: 'Usuário'}, {value: 'MASTER', label: 'Admin (MASTER)'}]}
-                  />
-                </div>
+        
+        <Card className="p-5 md:p-6 flex-1 bg-white">
+          <div className="flex flex-col sm:flex-row gap-4 items-end">
+            <div className="flex-1 w-full">
+              <label className="block text-[11px] font-bold text-slate-500 mb-2 uppercase tracking-wider">Razão Social / Nome Fantasia</label>
+              <div className="relative">
+                <Building className="absolute left-3 top-2.5 h-5 w-5 text-slate-400" />
+                <Input value={companyNameInput} onChange={(e:any) => setCompanyNameInput(e.target.value)} className="pl-10 h-11" placeholder="Ex: HitMark Corp" />
               </div>
+            </div>
+            <Button onClick={handleUpdateCompany} className="w-full sm:w-auto h-11 px-6 shrink-0 shadow-sm">Atualizar Dados</Button>
+          </div>
+        </Card>
+      </div>
 
-              {u.role !== 'MASTER' && (
-                <div className="border-t border-slate-200 pt-3 md:pt-4">
-                  <h4 className="text-[10px] md:text-xs font-semibold text-slate-600 uppercase mb-2 md:mb-3">Permissões</h4>
-                  <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 md:gap-4">
-                    {['dashboard', 'vendors', 'reports'].map(tab => (
-                      <div key={tab}>
-                        <label className="block text-[10px] md:text-xs text-slate-600 mb-1 capitalize">{tab === 'vendors' ? 'Equipe' : tab === 'reports' ? 'Relatórios' : tab}</label>
-                        <Select 
-                          className="h-8 text-[11px] md:text-xs"
-                          value={u.permissions?.[tab] || 'none'}
-                          onChange={(e:any) => handleUpdatePermission(u.id, tab, e.target.value)}
-                          options={[{value: 'none', label: 'Bloqueado'}, {value: 'view', label: 'Leitura'}, {value: 'edit', label: 'Total'}]}
-                        />
-                      </div>
-                    ))}
+      <div className="h-px bg-slate-200 w-full"></div>
+
+      {/* --- SEÇÃO: USUÁRIOS E ACESSOS --- */}
+      <div className="flex flex-col md:flex-row gap-4 md:gap-8">
+        <div className="w-full md:w-1/3">
+          <h3 className="text-lg font-bold text-slate-900">Controle de Acesso</h3>
+          <p className="text-sm text-slate-500 mt-1">Gerencie logins, senhas e níveis de permissão da sua equipe no sistema.</p>
+          <div className="mt-5 inline-flex items-center px-3 py-1.5 bg-indigo-50 text-indigo-700 rounded-full text-xs font-bold border border-indigo-100">
+            <Users className="w-4 h-4 mr-2" /> {users.length} Usuário(s) Cadastrado(s)
+          </div>
+        </div>
+        
+        <div className="flex-1 space-y-4">
+          {users.map(u => (
+            <Card key={u.id} className={`overflow-visible transition-all border-l-4 ${u.role === 'MASTER' ? 'border-l-indigo-500 shadow-md' : 'border-l-slate-300'}`}>
+              <div className="p-5 md:p-6">
+                
+                {/* Cabeçalho do Card do Usuário */}
+                <div className="flex justify-between items-start mb-6">
+                  <div className="flex items-center gap-3">
+                    <div className={`w-10 h-10 rounded-full flex items-center justify-center font-bold text-sm shadow-inner shrink-0 ${u.role === 'MASTER' ? 'bg-indigo-600 text-white' : 'bg-slate-100 text-slate-600 border border-slate-200'}`}>
+                      {u.name ? u.name.substring(0, 2).toUpperCase() : 'US'}
+                    </div>
+                    <div>
+                      <h4 className="font-bold text-slate-900 truncate max-w-[150px] sm:max-w-full">{u.name}</h4>
+                      <p className="text-[10px] md:text-xs text-slate-400 font-mono mt-0.5">ID: {u.id.substring(0, 8)}</p>
+                    </div>
+                  </div>
+                  {u.role === 'MASTER' ? (
+                    <Badge variant="indigo" className="text-[9px] md:text-[10px] uppercase tracking-wider px-2 py-1"><Shield className="w-3 h-3 mr-1"/> Admin</Badge>
+                  ) : (
+                    <Badge variant="default" className="text-[9px] md:text-[10px] uppercase tracking-wider px-2 py-1">Padrão</Badge>
+                  )}
+                </div>
+
+                {/* Campos de Edição Básicos */}
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-2">
+                  <div>
+                    <label className="block text-[10px] font-bold text-slate-500 mb-1.5 uppercase tracking-wider">Nome de Exibição</label>
+                    <Input defaultValue={u.name} onBlur={(e:any) => { if(e.target.value !== u.name) handleUpdateUser(u.id, 'name', e.target.value) }} className="h-9 text-sm" />
+                  </div>
+                  <div>
+                    <label className="block text-[10px] font-bold text-slate-500 mb-1.5 uppercase tracking-wider">Nova Senha (Numérica)</label>
+                    <Input type="password" inputMode="numeric" placeholder="••••" onBlur={(e:any) => { if(e.target.value.trim() !== '') { handleUpdateUser(u.id, 'code', e.target.value); e.target.value = ''; } }} className="h-9 text-sm" />
+                  </div>
+                  <div>
+                    <label className="block text-[10px] font-bold text-slate-500 mb-1.5 uppercase tracking-wider">Nível Global</label>
+                    <Select 
+                      value={u.role} 
+                      onChange={(e:any) => handleUpdateUser(u.id, 'role', e.target.value)}
+                      options={[{value: 'USER', label: 'Usuário Restrito'}, {value: 'MASTER', label: 'Admin (Total)'}]}
+                      className="h-9 text-sm font-medium"
+                    />
                   </div>
                 </div>
-              )}
-            </div>
+
+                {/* Área de Permissões Específicas (Escondida se for Master) */}
+                {u.role !== 'MASTER' && (
+                  <div className="mt-6 pt-5 border-t border-slate-100 bg-slate-50/50 -mx-5 md:-mx-6 -mb-5 md:-mb-6 p-5 md:p-6 rounded-b-xl">
+                    <h5 className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-3">Permissões de Módulos</h5>
+                    <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
+                      {['dashboard', 'vendors', 'reports'].map(tab => (
+                        <div key={tab} className="bg-white p-3 rounded-lg border border-slate-200 shadow-sm transition-colors hover:border-indigo-200">
+                          <label className="block text-[11px] font-semibold text-slate-700 mb-2 capitalize flex items-center gap-1.5">
+                            {tab === 'dashboard' && <LayoutDashboard className="w-3.5 h-3.5 text-indigo-500"/>}
+                            {tab === 'vendors' && <Users className="w-3.5 h-3.5 text-emerald-500"/>}
+                            {tab === 'reports' && <Printer className="w-3.5 h-3.5 text-amber-500"/>}
+                            {tab === 'vendors' ? 'Equipe' : tab === 'reports' ? 'Relatórios' : tab}
+                          </label>
+                          <Select 
+                            className="h-8 text-[11px] w-full bg-slate-50 border-slate-100"
+                            value={u.permissions?.[tab] || 'none'}
+                            onChange={(e:any) => handleUpdatePermission(u.id, tab, e.target.value)}
+                            options={[{value: 'none', label: '🔒 Bloqueado'}, {value: 'view', label: '👁️ Apenas Leitura'}, {value: 'edit', label: '✏️ Edição Total'}]}
+                          />
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+              </div>
+            </Card>
           ))}
         </div>
-      </Card>
+      </div>
     </div>
   );
 }
