@@ -117,16 +117,6 @@ export default function App() {
   const [view, setView] = useState<'login' | 'register' | 'app'>('login');
   const [companySettings, setCompanySettings] = useState({ name: 'HitMark Company' });
 
-  // ✅ FIX: aplica/remove a classe 'dark' no <html> toda vez que o tema mudar
-  useEffect(() => {
-    const root = document.documentElement;
-    if (theme === 'dark') {
-      root.classList.add('dark');
-    } else {
-      root.classList.remove('dark');
-    }
-  }, [theme]);
-
   const toggleTheme = () => setTheme(prev => prev === 'dark' ? 'light' : 'dark');
 
   useEffect(() => {
@@ -157,7 +147,8 @@ export default function App() {
       const foundUserDoc = snap.docs.find(doc => doc.data().code === code);
       
       if (foundUserDoc) {
-        const userData = { id: foundUserDoc.id, ...foundUserDoc.data() };
+        // Correção do TypeScript adicionando a tipagem "any"
+        const userData: any = { id: foundUserDoc.id, ...(foundUserDoc.data() as any) };
         setCurrentUser(userData);
         setView('app');
         showToast(`Bem-vindo(a) de volta, ${userData.name}!`);
@@ -214,41 +205,43 @@ export default function App() {
 
   if (isInitializing) {
     return (
-      // ✅ Sem wrapper com classe 'dark' — o tema já está no <html>
-      <div className="min-h-screen bg-slate-50 dark:bg-slate-950 flex items-center justify-center">
-        <div className="flex flex-col items-center">
-          <Target className="w-12 h-12 text-indigo-500 animate-pulse mb-4" />
-          <p className="text-slate-500 dark:text-slate-400 font-medium">Inicializando HitMark...</p>
+      <div className={`${theme === 'dark' ? 'dark' : ''}`}>
+        <div className="min-h-screen bg-slate-50 dark:bg-slate-950 flex items-center justify-center">
+          <div className="flex flex-col items-center">
+            <Target className="w-12 h-12 text-indigo-500 animate-pulse mb-4" />
+            <p className="text-slate-500 dark:text-slate-400 font-medium">Inicializando HitMark...</p>
+          </div>
         </div>
       </div>
     );
   }
 
-  // ✅ Removido o wrapper <div className={`${theme === 'dark' ? 'dark' : ''}`}>
   return (
-    <div className="min-h-screen bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-200 font-sans selection:bg-indigo-500/30 transition-colors">
-      
-      {toast.type && (
-        <div className={`fixed top-4 right-4 z-50 px-4 py-3 rounded-lg shadow-2xl border flex items-center animate-in slide-in-from-top-2 ${toast.type === 'success' ? 'bg-emerald-50 dark:bg-emerald-950/80 border-emerald-200 dark:border-emerald-900 text-emerald-700 dark:text-emerald-400' : 'bg-red-50 dark:bg-red-950/80 border-red-200 dark:border-red-900 text-red-700 dark:text-red-400'}`}>
-          {toast.type === 'success' ? <CheckCircle2 className="w-5 h-5 mr-2" /> : <AlertCircle className="w-5 h-5 mr-2" />}
-          <span className="text-sm font-medium">{toast.message}</span>
-        </div>
-      )}
+    <div className={`${theme === 'dark' ? 'dark' : ''}`}>
+      <div className="min-h-screen bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-200 font-sans selection:bg-indigo-500/30 transition-colors">
+        
+        {toast.type && (
+          <div className={`fixed top-4 right-4 z-50 px-4 py-3 rounded-lg shadow-2xl border flex items-center animate-in slide-in-from-top-2 ${toast.type === 'success' ? 'bg-emerald-50 dark:bg-emerald-950/80 border-emerald-200 dark:border-emerald-900 text-emerald-700 dark:text-emerald-400' : 'bg-red-50 dark:bg-red-950/80 border-red-200 dark:border-red-900 text-red-700 dark:text-red-400'}`}>
+            {toast.type === 'success' ? <CheckCircle2 className="w-5 h-5 mr-2" /> : <AlertCircle className="w-5 h-5 mr-2" />}
+            <span className="text-sm font-medium">{toast.message}</span>
+          </div>
+        )}
 
-      {view === 'login' && <LoginScreen onLogin={handleLogin} onGoRegister={() => setView('register')} />}
-      {view === 'register' && <RegisterScreen onRegister={handleRegister} onGoLogin={() => setView('login')} />}
-      
-      {view === 'app' && currentUser && (
-        <MainApp 
-          currentUser={currentUser} 
-          onLogout={handleLogout} 
-          companySettings={companySettings}
-          setCompanySettings={setCompanySettings}
-          showToast={showToast}
-          theme={theme}
-          toggleTheme={toggleTheme}
-        />
-      )}
+        {view === 'login' && <LoginScreen onLogin={handleLogin} onGoRegister={() => setView('register')} />}
+        {view === 'register' && <RegisterScreen onRegister={handleRegister} onGoLogin={() => setView('login')} />}
+        
+        {view === 'app' && currentUser && (
+          <MainApp 
+            currentUser={currentUser} 
+            onLogout={handleLogout} 
+            companySettings={companySettings}
+            setCompanySettings={setCompanySettings}
+            showToast={showToast}
+            theme={theme}
+            toggleTheme={toggleTheme}
+          />
+        )}
+      </div>
     </div>
   );
 }
@@ -352,7 +345,8 @@ function MainApp({ currentUser, onLogout, companySettings, setCompanySettings, s
     if (!currentUser) return;
     const vendorsRef = collection(db, 'artifacts', appId, 'users', currentUser.id, 'vendors');
     const unsubscribe = onSnapshot(vendorsRef, (snapshot) => {
-      const vData = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+      // Correção do TypeScript adicionando a tipagem "any"
+      const vData = snapshot.docs.map(doc => ({ id: doc.id, ...(doc.data() as any) }));
       setVendors(vData.sort((a, b) => a.name.localeCompare(b.name)));
       if (vData.length > 0 && !selectedVendorId) {
         setSelectedVendorId(vData[0].id);
@@ -686,7 +680,7 @@ function VendorsManager({ vendors, currentUser, currentYear, showToast, hasEditP
     const numericValue = parseFloat(value.replace(/[^0-9.-]+/g,""));
     const finalVal = isNaN(numericValue) ? 0 : numericValue;
 
-    const vendor = vendors.find((v: any) => v.id === vendorId);
+    const vendor = vendors.find(v => v.id === vendorId);
     const currentActuals = vendor.actuals?.[monthKey] || [];
     const newActuals = [...currentActuals];
     const weeks = getWeeksInMonth(currentYear, parseInt(monthKey.split('-')[1]));
@@ -724,7 +718,7 @@ function VendorsManager({ vendors, currentUser, currentYear, showToast, hasEditP
       )}
 
       <div className="grid grid-cols-1 gap-4">
-        {vendors.map((vendor: any) => (
+        {vendors.map(vendor => (
           <Card key={vendor.id} className="overflow-visible transition-all hover:border-slate-300 dark:hover:border-slate-700">
             <div 
               className="p-5 flex justify-between items-center cursor-pointer hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors"
@@ -942,7 +936,7 @@ function ReportsView({ vendor, year, companySettings }: any) {
         </div>
       </Card>
       
-      {/* PRINT FOOTER - Fixed at Bottom during print */}
+      {/* PRINT FOOTER NEXIO - Fixed at Bottom during print */}
       <div className="fixed bottom-4 left-0 w-full text-[10px] text-center text-slate-400 print-only uppercase tracking-widest font-semibold">
         DEVELOPED BY NEXIO
       </div>
@@ -957,7 +951,8 @@ function SettingsManager({ companySettings, setCompanySettings, showToast, curre
   useEffect(() => {
     const fetchUsers = async () => {
       const usersSnap = await getDocs(collection(db, 'artifacts', appId, 'public', 'data', 'app_users'));
-      setUsers(usersSnap.docs.map(d => ({ id: d.id, ...d.data() })));
+      // Correção do TypeScript adicionando a tipagem "any"
+      setUsers(usersSnap.docs.map(d => ({ id: d.id, ...(d.data() as any) })));
     };
     fetchUsers();
   }, []);
