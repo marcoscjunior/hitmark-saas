@@ -1,17 +1,16 @@
-import type { Config } from 'tailwindcss'
+import type { Config } from "tailwindcss";
 
 const config: Config = {
   content: [
-    './pages/**/*.{js,ts,jsx,tsx,mdx}',
-    './components/**/*.{js,ts,jsx,tsx,mdx}',
-    './app/**/*.{js,ts,jsx,tsx,mdx}',
-    './src/**/*.{js,ts,jsx,tsx,mdx}',
-    // Se o seu arquivo se chamar page.tsx, App.tsx, etc., garanta que a pasta dele está mapeada acima.
+    "./src/pages/**/*.{js,ts,jsx,tsx,mdx}",
+    "./src/components/**/*.{js,ts,jsx,tsx,mdx}",
+    "./src/app/**/*.{js,ts,jsx,tsx,mdx}",
+    "./src/**/*.{js,ts,jsx,tsx,mdx}", // <--- ESSA LINHA É A MAIS IMPORTANTE
   ],
-  darkMode: 'class', // Importante já que você tem a função de dark/light mode
+  darkMode: 'class',
   theme: {
     extend: {},
   },
   plugins: [],
-}
-export default config
+};
+export default config;
